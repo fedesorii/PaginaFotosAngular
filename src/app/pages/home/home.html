@@ -1,0 +1,12 @@
+<div class="gallery-container">
+  @for (item of galleries; track item.id) {
+    <a [routerLink]="['/gallery', item.id]" class="gallery-item">
+      <div class="image-wrapper">
+        <img [src]="item.photos[0]" [alt]="item.title" />
+        <div class="overlay">
+          <span class="info-text">{{ item.title }}</span>
+        </div>
+      </div>
+    </a>
+  }
+</div>

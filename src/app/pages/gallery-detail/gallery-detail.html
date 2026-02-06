@@ -1,0 +1,17 @@
+<div class="header">
+  <a routerLink="/">⬅ Volver al inicio</a>
+
+  @if (info()) {
+    <h1>{{ info()?.title }}</h1>
+
+    <div class="grid-photos">
+      @for (photo of info()?.photos; track $index) {
+        <div class="photo-item">
+          <img [src]="photo" alt="Fotografía del evento" />
+        </div>
+      }
+    </div>
+  } @else {
+    <h2>Lo siento, esta galería no existe.</h2>
+  }
+</div>
