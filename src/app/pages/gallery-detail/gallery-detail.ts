@@ -1,10 +1,9 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { Gallery } from '../../services/gallery';
-import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-gallery-detail',
-  imports: [RouterLink],
+  imports: [],
   templateUrl: './gallery-detail.html',
   styleUrl: './gallery-detail.css',
 })

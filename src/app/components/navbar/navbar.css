@@ -1,0 +1,145 @@
+.navbar {
+  display: flex;
+  justify-content: space-between; /* Distribuye espacio entre izq, centro y der */
+  align-items: center;
+  background-color: #f3f1e7;
+  padding: 20px 40px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  /* height: 80px; */
+  border-bottom: 1px solid rgba(0,0,0,0.05); /* Línea sutil */
+}
+
+/* --- LOGO (Centro) --- */
+.logo {
+  text-decoration: none;
+  color: #333;
+  font-family: 'Playfair Display', serif; /* Si la tienes cargada */
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.logo img {
+  height: 40px; /* Ajusta según tu logo real */
+}
+
+/* --- ENLACES (Izquierda en escritorio) --- */
+.nav-links {
+  display: flex;
+  gap: 30px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  /* font-family: sans-serif; */
+  font-size: 0.95rem;
+  color: #4a4a4a;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.nav-links a:hover, .active-link, .logo-text:hover {
+  color: #000000;
+  font-weight: 600;
+}
+
+/* --- REDES SOCIALES (Derecha) --- */
+.social-media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.social-media a {
+  display: flex;
+  color: #4a4a4a;
+  transition: color 0.3s ease;
+}
+
+.social-media svg{
+  width: 22px;
+  height: 22px;
+}
+
+.social-media a:hover {
+  color: #000000;
+  transform: scale(1.1);
+}
+
+/* --- BOTÓN HAMBURGUESA (Oculto en PC) --- */
+.hamburger-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+}
+.hamburger-btn svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* ========================================= */
+/* -------------- RESPONSIVE --------------- */
+/* ========================================= */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 15px 20px;
+    justify-content: space-between; /* Botón izq, Logo der/centro */
+  }
+
+  /* El logo ya no puede ser absoluto en el centro porque podría tapar el botón */
+  .logo {
+    /* position: static; */
+    /* transform: none; */
+    margin-left: auto;
+    font-size: 1.4rem;
+  }
+
+  .logo-text:hover, .logo-text {
+    color: #4a4a4a;
+    font-weight: 500;
+  }
+
+  .social-media {
+    display: none;
+  }
+
+  .hamburger-btn {
+  display: block; /* Aparece el botón */
+  }
+
+  /* MENÚ DESPLEGABLE */
+  .nav-links {
+    position: absolute;
+    top: 60px; /* Justo debajo del navbar */
+    left: 0;
+    width: 100%;
+    background-color: #f3f1e7;
+    flex-direction: column; /* Lista vertical */
+    align-items: center;
+    gap: 0;
+    overflow: hidden;
+    max-height: 0; /* Cerrado por defecto */
+    transition: max-height 0.4s ease-in-out; /* Animación suave */
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+
+  /* CLASE QUE ABRE EL MENÚ (Controlada por Angular) */
+  .nav-links.open {
+    max-height: 200px; /* Altura suficiente para los links */
+  }
+
+  .nav-links a {
+    padding: 15px;
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid rgba(0,0,0,0.03);
+  }
+}
