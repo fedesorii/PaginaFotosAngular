@@ -1,0 +1,31 @@
+<div class="navbar">
+  <button class="hamburger-btn" (click)="toggleMenu()" aria-label="Abrir menú">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 6H20M4 12H20M4 18H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <a routerLink="/" class="logo" (click)="closeMenu()">
+    <img src="assets/logo.png" alt="Logo" onerror="this.style.display='none'"/> 
+    <span class="logo-text">Fotos Manolito</span> 
+  </a>
+
+  <div class="nav-links" [class.open]="isMenuOpen()">
+    <a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}" (click)="closeMenu()">Home</a>
+    <a routerLink="/about-us" routerLinkActive="active-link" (click)="closeMenu()">About Us</a>
+    <a routerLink="/contact" routerLinkActive="active-link" (click)="closeMenu()">Contact</a>
+  </div>
+
+  <div class="social-media">
+    <a href="https://www.instagram.com/leomessi/" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16.65 7.2H16.66M8 20H16C18.2091 20 20 18.2091 20 16V8C20 5.79086 18.2091 4 16 4H8C5.79086 4 4 5.79086 4 8V16C4 18.2091 5.79086 20 8 20ZM15.75 12C15.75 14.0711 14.0711 15.75 12 15.75C9.92893 15.75 8.25 14.0711 8.25 12C8.25 9.92893 9.92893 8.25 12 8.25C14.0711 8.25 15.75 9.92893 15.75 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </a>
+    <a href="https://ar.pinterest.com/pin/17944098512117984/" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7.45 13.18C6.34 10.92 7.85 6.51 12.92 7.23C18.51 8.03 17.51 16.71 12.85 16.37C11.37 16.26 10.82 15.04 10.67 13.79M10.67 13.79C10.56 12.85 10.69 11.89 10.83 11.38C11.07 10.53 11.48 10.64 11.18 11.78C11.04 12.33 10.86 13.02 10.67 13.79ZM10.67 13.79C10.16 15.85 9.52 18.48 9.04 20.5M9.04 20.5C9.97 20.82 10.96 21 12 21C16.97 21 21 16.97 21 12C21 7.03 16.97 3 12 3C7.03 3 3 7.03 3 12C3 15.93 5.52 19.28 9.04 20.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </div>
+</div>
