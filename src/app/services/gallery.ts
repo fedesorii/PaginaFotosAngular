@@ -10,77 +10,54 @@ export interface CloudinaryResponse {
   }[];
 }
 
+export interface GalleryItem {
+  id: string;
+  title: string;
+  tag: string; // El tag que usaremos para cargar las fotos desde Cloudinary
+  coverPhoto: string; // URL de la foto de portada para la Home
+}
+
 @Injectable({
   providedIn: 'root', // Servicio disponible en toda la aplicación
 })
 export class Gallery {
   private http = inject(HttpClient);
-
   private cloudName = 'ddozsonun'; // Reemplaza con tu Cloud Name de Cloudinary
 
-  //Acá cargamos los objetos de las galerías
-private data = [
-  {
-    id: 'bonaburguense',
-    title: 'Boda Bonaburguense',
-    tag: 'galeria-bonaburguense', // El tag que creaste en Cloudinary
-    // Para la Home, ponemos una foto manual estática o de Cloudinary
-    coverPhoto: 'https://res.cloudinary.com/ddozsonun/image/upload/q_auto,f_auto/v1772426127/BonaBurguense_00.jpg' 
-  },
-  // Aquí agregarías el siguiente evento en el futuro
-];
+  // 1. Busca automáticamente todas las fotos con la etiqueta 'portadas-home'
+  getGalleriesFromCloudinary(): Observable<GalleryItem[]> {
+    const url = `https://res.cloudinary.com/${this.cloudName}/image/list/portadas-home.json`;
 
-  // private data = [
-  //   {
-  //     id: 'bodas',
-  //     title: 'Bodas de Ensueño',
-  //     photos: ['https://picsum.photos/id/103/800', 'https://picsum.photos/id/104/800'],
-  //   },
-  //   {
-  //     id: 'retratos',
-  //     title: 'Retratos Urbanos',
-  //     photos: ['https://picsum.photos/id/64/800', 'https://picsum.photos/id/65/800'],
-  //   },
-  //   {
-  //     id: 'lorem',
-  //     title: 'lorem ipsum',
-  //     photos: ['https://picsum.photos/id/30/800', 'https://picsum.photos/id/31/800'],
-  //   },
-  //   {
-  //     id: 'abba',
-  //     title: 'Navida Habba',
-  //     photos: ['https://picsum.photos/id/130/800', 'https://picsum.photos/id/131/800'],
-  //   },
-  //   {
-  //     id: 'ipsum',
-  //     title: 'ipsum lorem',
-  //     photos: ['https://picsum.photos/id/12/800', 'https://picsum.photos/id/13/800'],
-  //   },
-  //   {
-  //     id: 'Perry',
-  //     title: 'El Ornitorrinco',
-  //     photos: ['https://picsum.photos/id/3/800', 'https://picsum.photos/id/4/800'],
-  //   },
-  //   {
-  //     id: 'Arctic Monkeys',
-  //     title: 'Do I Wanna Know?',
-  //     photos: ['https://picsum.photos/id/250/800', 'https://picsum.photos/id/251/800'],
-  //   },
-  //   {
-  //     id: 'nana nana nana nana',
-  //     title: 'BATMAN!!',
-  //     photos: ['https://picsum.photos/id/198/800', 'https://picsum.photos/id/199/800'],
-  //   },
-  // ];
+    return this.http.get<CloudinaryResponse>(url).pipe(
+      map(response => {
+        return response.resources.sort((a, b) => a.public_id.localeCompare(b.public_id)).map(res => {
+          // Extraemos el nombre de la carpeta (ej: "bonaburguense/foto00" -> "bonaburguense")
+          const folderName = res.public_id.includes('/') ? res.public_id.split('/')[0] : res.public_id;
 
-  getAll() {
-    return this.data;
+          // Formateamos el título para que quede presentable (ej: "boda-marina" -> "Boda Marina")
+          const formattedTitle = folderName.replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+
+          return {
+            id: folderName,
+            title: formattedTitle,
+            tag: folderName,
+            coverPhoto: `https://res.cloudinary.com/${this.cloudName}/image/upload/q_auto,f_auto/v${res.version}/${res.public_id}.${res.format}`,
+          };
+        });
+      })
+    );
   }
 
+  // 2. Como el ID es el nombre de la carpeta, construimos la info al vuelo
   getById(id: string) {
-    return this.data.find((g) => g.id === id);
+    return {
+      id,
+      title: id.replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase()),
+      tag: id,
+    };
   }
 
+  // 3. Busca las fotos usando el tag de la carpeta
   getPhotosByTag(tag: string): Observable<string[]> {
     const url = `https://res.cloudinary.com/${this.cloudName}/image/list/${tag}.json`;
 

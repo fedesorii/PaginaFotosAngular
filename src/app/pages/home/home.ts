@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Gallery } from '../../services/gallery';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-home',
@@ -11,5 +12,5 @@ import { Gallery } from '../../services/gallery';
 export class Home {
   private galleryService = inject(Gallery);
 
-  galleries = this.galleryService.getAll();
+  galleries = toSignal(this.galleryService.getGalleriesFromCloudinary(), { initialValue: [] });
 }
