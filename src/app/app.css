@@ -11,3 +11,63 @@
 app-footer {
     align-self:flex-end;
 }
+
+/* Back to Top Button */
+.back-to-top {
+    position: fixed;
+    bottom: 2.5rem;
+    right: 2.5rem;
+    width: 3.2rem;
+    height: 3.2rem;
+    background-color: transparent;
+    color: #111;
+    border: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 999;   /* Siempre por encima del contenido */
+
+    /* Animación de entrada/salida */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);    /* Arranca un poco más abajo */
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Clase que agrega Angular cuando se hace scroll */
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);   /* Vuelve a su posición original */
+}
+
+/* --- Estilo del Icono SVG --- */
+.back-to-top svg {
+    width: 100%;
+    height: 100%;
+    fill: #111;
+    transition: fill 0.3s ease, transform 0.3s ease;
+}
+
+/* Efecto Hover para PC */
+.back-to-top:hover svg{
+    fill: #666;
+    transform: translateY(-3px); /* Le damos un pequeño salto al icono */
+}
+
+/* --- RESPONSIVE PARA SMARTPHONES --- */
+@media (max-width: 768px) {
+    .back-to-top {
+        bottom: 1.5rem;
+        right: 1.5rem;
+        width: 2.8rem;
+        height: 2.8rem;
+    }
+
+    .back-to-top:hover svg {
+        fill: #111;
+        transform: none;
+    }
+}

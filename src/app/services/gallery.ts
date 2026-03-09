@@ -41,7 +41,7 @@ export class Gallery {
             id: folderName,
             title: formattedTitle,
             tag: folderName,
-            coverPhoto: `https://res.cloudinary.com/${this.cloudName}/image/upload/q_auto,f_auto/v${res.version}/${res.public_id}.${res.format}`,
+            coverPhoto: `https://res.cloudinary.com/${this.cloudName}/image/upload/q_auto,f_auto,c_fill,ar_4:6,w_800/v${res.version}/${res.public_id}.${res.format}`,
           };
         });
       })
@@ -65,7 +65,7 @@ export class Gallery {
       map(response => {
         // Transformamos los datos crudos en URLs de imágenes optimizadas
         return response.resources.map(res => 
-          `https://res.cloudinary.com/${this.cloudName}/image/upload/q_auto,f_auto/v${res.version}/${res.public_id}.${res.format}`
+          `https://res.cloudinary.com/${this.cloudName}/image/upload/q_auto,f_auto,c_fill,ar_4:6,w_800/v${res.version}/${res.public_id}.${res.format}`
         );
       })
     );
