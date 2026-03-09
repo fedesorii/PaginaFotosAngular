@@ -1,0 +1,162 @@
+.contact-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 5%;
+    min-height: 80vh;
+}
+
+/* --- COLUMNA IZQUIERDA --- */
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    padding-top: 1rem;
+}
+
+.contact-title {
+    font-size: 1.2rem;
+    font-weight: 400;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #111;
+    margin-bottom: 3rem;
+}
+
+.contact-quote {
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    font-size: clamp(1.5rem, 2vw, 2rem);
+    color: #555;
+    margin: 0 0 5rem 0;
+    line-height: 1.4;
+}
+
+.info-blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+/* ¡ESTA ES LA REGLA QUE FALTABA! Separa y estiliza los subtítulos */
+.info-block span {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #888;
+    margin-bottom: 0.5rem;
+}
+
+.info-block a, 
+.info-block p {
+    font-size: 1.1rem;
+    color: #111;
+    text-decoration: none;
+    font-weight: 300;
+    transition: color 0.3s ease;
+    margin: 0;
+}
+
+.info-block a:hover {
+    color: #666; /* Un gris más oscuro para el hover */
+}
+
+/* --- COLUMNA DERECHA --- */
+.contact-form-wrapper {
+    padding-top: 1rem;
+}
+
+.editorial-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem; /* Reduje un poco el espacio exterior para dar más espacio interior */
+}
+
+.form-group {
+    position: relative;
+    width: 100%;
+}
+
+/* Estilos de línea tipo cuaderno para Inputs y Textarea */
+.editorial-form input,
+.editorial-form textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #ccc; /* Línea un poco más visible */
+    padding: 1rem 0; /* MÁS RESPIRACIÓN: Separa el texto de la línea */
+    font-size: 1.15rem; /* Texto levemente más grande */
+    line-height: 1.6; /* Mejor interlineado para el mensaje */
+    font-family: inherit;
+    font-weight: 300;
+    color: #111;
+    transition: border-color 0.4s ease;
+    resize: none; 
+}
+
+/* Altura mínima específica para el cuadro de mensaje */
+.editorial-form textarea {
+    min-height: 120px; 
+}
+
+/* Efecto al hacer clic para escribir */
+.editorial-form input:focus,
+.editorial-form textarea:focus {
+    outline: none;
+    border-bottom: 1px solid #111;
+}
+
+.editorial-form input::placeholder,
+.editorial-form textarea::placeholder {
+    color: #aaa;
+    font-weight: 300;
+}
+
+/* --- Botón Minimalista --- */
+.btn-minimalist {
+    display: inline-block;
+    padding: 1rem 3rem;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #111;
+    background-color: transparent;
+    border: 1px solid #111;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    align-self: flex-start;
+    margin-top: 1.5rem;
+}
+
+.btn-minimalist:hover:not([disabled]) {
+    background-color: #111;
+    color: #fff;
+}
+
+.btn-minimalist[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* --- Mensajes de error --- */
+.error-message {
+    color: #d9534f;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    font-weight: 300;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 900px) {
+    .contact-container {
+        grid-template-columns: 1fr;
+        padding: 4rem 5%;
+        gap: 4rem;
+    }
+
+    .contact-quote {
+        margin-bottom: 3rem;
+    }
+}

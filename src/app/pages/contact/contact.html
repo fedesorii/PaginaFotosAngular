@@ -1,1 +1,63 @@
-<p>contact works!</p>
+<section class="contact-container">
+    <div class="contact-info">
+        <h1 class="contact-title">Contactar</h1>
+
+        <blockquote class="contact-quote">"Me interesa lo que no se ve a simple vista."</blockquote>
+
+        <div class="info-blocks">
+            <div class="info-block">
+                <span>Email</span>
+                <a href="mailto:info@ejemplo.com">info@ejemplo.com</a>
+            </div>
+
+            <div class="info-block">
+                <span>Instagram</span>
+                <a href="https://www.instagram.com/leomessi/" target="_blank" rel="noopener">@messi</a>
+            </div>
+
+            <div class="info-block">
+                <span>Pinterest</span>
+                <a href="https://ar.pinterest.com/pin/17944098512117984/" target="_blank" rel="noopener">@snoopy</a>
+            </div>
+
+            <div class="info-block">
+                <span>Estudio</span>
+                <p>Quilmes, Buenos Aires, Argentina</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="contact-form-wrapper">
+        <form class="editorial-form" (submit)="onSubmit($event)">
+            <div class="form-group">
+                <input type="text" id="name" name="user_name" placeholder="Tu nombre" required>
+            </div>
+
+            <div class="form-group">
+                <input type="email" id="email" name="user_email" placeholder="Tu email" required>
+            </div>
+
+            <div class="form-group">
+                <input type="text" id="subject" name="subject" placeholder="¿De qué se trata? (Boda, evento, editorial, etc.)" required>
+            </div>
+
+            <div class="form-group">
+                <textarea id="message" name="message" placeholder="Cuéntame tu idea..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-minimalist" [disabled]="isSending">
+                @if (isSending) {
+                    Enviando...
+                } @else if (isSent) {
+                    Mensaje enviado
+                } @else {
+                    Enviar mensaje
+                }
+            </button>
+
+            @if (errorMessage) {
+                <p class="error-message">{{ errorMessage }}</p>
+            }
+        </form>
+    </div>
+</section>
