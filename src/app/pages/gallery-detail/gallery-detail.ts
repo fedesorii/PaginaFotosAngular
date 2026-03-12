@@ -1,9 +1,10 @@
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, HostListener, inject, input, signal } from '@angular/core';
 import { Gallery } from '../../services/gallery';
+import { Reveal } from '../../directives/reveal';
 
 @Component({
   selector: 'app-gallery-detail',
-  imports: [],
+  imports: [Reveal],
   templateUrl: './gallery-detail.html',
   styleUrl: './gallery-detail.css',
 })
@@ -16,6 +17,10 @@ export class GalleryDetail {
 
   // 2. Creamos un Signal vacío para guardar las fotos que llegarán de internet
   photos = signal<string[]>([]);
+
+  // Estado del Lightbox usando Signals
+  isLightboxOpen = signal(false);
+  selectedImage = signal<string>('');
 
   constructor() {
     // 3. El effect "escucha". Cuando detecta que entramos a una galería (hay info nueva)...
@@ -30,5 +35,34 @@ export class GalleryDetail {
         });
       }
     });
+  }
+
+  // Funciones para manejar el Lightbox
+  openLightbox(photoUrl: string) {
+    // Reemplazamos los parámetros de miniatura por los de alta resolución
+    const highResUrl = photoUrl.replace(/c_fill,ar_4:6,w_800/, 'c_limit,w_1600');
+
+    this.selectedImage.set(highResUrl);
+    this.isLightboxOpen.set(true);
+
+    // Bloqueamos el scroll de la página detrás del modal
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeLightbox() {
+    this.isLightboxOpen.set(false);
+    this.selectedImage.set('');
+
+    // Restauramos el scroll de la página
+    document.body.style.overflow = 'auto';
+  }
+
+  // Permite cerrar el modal con la tecla "Escape"
+  @HostListener('document:keydown.escape', ['$event'])
+  onKeydownHandler(e: Event) {
+    const event = e as KeyboardEvent;
+    if (this.isLightboxOpen()) {
+      this.closeLightbox();
+    }
   }
 }

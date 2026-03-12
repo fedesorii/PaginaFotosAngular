@@ -5,7 +5,7 @@
     @if (photos().length > 0) {
       <div class="grid-photos">
         @for (photo of photos(); track $index) {
-          <div class="photo-item">
+          <div class="photo-item" appReveal (click)="openLightbox(photo)" style="cursor: zoom-in;">
             <img [src]="photo" alt="Fotografía del evento" />
           </div>
         }
@@ -17,3 +17,10 @@
     <h2>Lo siento, esta galería no existe.</h2>
   }
 </div>
+
+@if (isLightboxOpen()) {
+  <div class="lightbox-overlay" (click)="closeLightbox()">
+    <button class="close-btn" (click)="closeLightbox()" aria-label="Cerrar imagen">Cerrar</button>
+    <img [src]="selectedImage()" alt="vista ampliada de la fotografía" class="lightbox-img" (click)="$event.stopPropagation()"/>
+  </div>
+}

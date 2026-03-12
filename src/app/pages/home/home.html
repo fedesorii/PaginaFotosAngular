@@ -1,7 +1,7 @@
 <div class="gallery-container">
   @for (item of galleries(); track item.id) {
     <a [routerLink]="['/gallery', item.id]" class="gallery-item">
-      <div class="image-wrapper">
+      <div class="image-wrapper" appReveal>
         <img [src]="item.coverPhoto" [alt]="item.title" />
         <div class="overlay">
           <span class="info-text">{{ item.title }}</span>

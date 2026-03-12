@@ -2,10 +2,11 @@ import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Gallery } from '../../services/gallery';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Reveal } from '../../directives/reveal';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink],
+  imports: [RouterLink, Reveal],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

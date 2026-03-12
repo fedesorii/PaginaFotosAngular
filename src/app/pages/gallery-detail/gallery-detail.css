@@ -16,3 +16,79 @@
   border-radius: 4px;
   display: block;
 }
+
+/* --- LIGHTBOX (MODAL) --- */
+.lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(10, 10, 10, 0.949); /* Negro casi total */
+  z-index: 9999; /* Por encima del botón "Back to top" y la navbar */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: radial-gradient(circle, #1a1a1a 0%, #0a0a0a 100%);
+  
+  /* Animación */
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.lightbox-img {
+  background-color: #222;
+  min-height: 450px;
+  min-width: 300px;
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain; /* Nunca se deforma ni se recorta en el modal */
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  
+  /* Animación de entrada de la foto */
+  animation: zoomIn 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+
+/* Botón Minimalista de Cerrar */
+.close-btn {
+  position: absolute;
+  top: 2rem;
+  right: 2.5rem;
+  background: transparent;
+  color: #fff;
+  border: none;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  cursor: pointer;
+  z-index: 10000;
+  padding: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+  color: #aaa;
+}
+
+/* --- ANIMACIONES --- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* --- RESPONSIVE DEL LIGHTBOX --- */
+@media (max-width: 768px) {
+  .lightbox-img {
+    max-width: 95vw;
+    max-height: 85vh;
+  }
+  
+  .close-btn {
+    top: 1.5rem;
+    right: 1.5rem;
+  }
+}
