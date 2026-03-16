@@ -19,7 +19,7 @@
   color: white;
 }
 
-/* --- REGLA 1: FORZAR COLUMNAS (El secreto del orden) --- */
+/* --- REGLA 1: FORZAR COLUMNAS --- */
 /* Esto obliga a que vaya en su columna correspondiente */
 /* Crea 4 "torres" verticales independientes */
 /* Ciclo de 8 fotos que se repite eternamente (8n) */
@@ -96,8 +96,43 @@
 /* --- RESPONSIVE --- */
 /* ------------------ */
 
-/* Tablet: Pasamos a 2 columnas manteniendo el ritmo */
 @media (max-width: 900px) {
+  .info-text {
+    font-size: 1.2rem;
+  }
+}
+
+/* Tabletas: Pasamos a 3 columnas, manteniendo el ritmo */
+@media (max-width: 600px) {
+  .gallery-container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  /* Reseteamos las columnas forzadas de escritorio */
+  .gallery-item:nth-child(n) {
+    grid-column: auto;
+  }
+
+  /* Reset de alturas */
+  .gallery-item:nth-child(n) { grid-row: span 5; }
+
+  /* Nuevo patrón para 3 columnas: La primera y tercera foto son altas */
+  .gallery-item:nth-child(1) {
+    grid-row: span 4;
+  }
+
+  .gallery-item:nth-child(3) {
+    grid-row: span 4;
+  }
+
+  .info-text {
+    font-size: 1.1rem;
+  }
+}
+
+/* Celulares: Pasamos a 2 columnas manteniendo el ritmo */
+@media (max-width: 450px) {
   .gallery-container {
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
@@ -115,13 +150,17 @@
   .gallery-item:nth-child(1) {
     grid-row: span 4;
   }
+
+  .info-text {
+    font-size: 1rem;
+  }
 }
 
-/* Móvil: 1 sola columna */
-@media (max-width: 600px) {
+/* Móvil: 1 sola columna (lo desactivamos temporalmente por pedido de arriba*/ 
+/* @media (max-width: 400px) {
   .gallery-container {
     grid-template-columns: 1fr;
-    grid-auto-rows: auto; /* Bien altas */
+    grid-auto-rows: auto;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -129,4 +168,4 @@
   .gallery-item {
     height: auto;
   }
-}
+} */

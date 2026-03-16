@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between; /* Distribuye espacio entre izq, centro y der */
   align-items: center;
-  background-color: #f3f1e7;
+  /* background-color: #f3f1e7; */
   padding: 20px 40px;
   position: sticky;
   top: 0;
@@ -88,7 +88,7 @@
 /* ========================================= */
 /* -------------- RESPONSIVE --------------- */
 /* ========================================= */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .navbar {
     padding: 15px 20px;
     justify-content: space-between; /* Botón izq, Logo der/centro */
