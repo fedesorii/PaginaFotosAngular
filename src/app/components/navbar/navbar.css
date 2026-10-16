@@ -121,7 +121,7 @@
     top: 60px; /* Justo debajo del navbar */
     left: 0;
     width: 100%;
-    background-color: #f3f1e7;
+    /* background-color: #f3f1e7; */
     flex-direction: column; /* Lista vertical */
     align-items: center;
     gap: 0;
