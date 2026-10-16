@@ -1,31 +1,119 @@
-<div class="navbar">
-  <button class="hamburger-btn" (click)="toggleMenu()" aria-label="Abrir menú">
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4 6H20M4 12H20M4 18H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </button>
+<header class="navbar-wrapper">
+  <nav class="navbar" aria-label="Navegación principal">
+    <button
+      type="button"
+      class="hamburger-btn"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="isMenuOpen()"
+      aria-label="Abrir menú de navegación"
+    >
+      <span class="hamburger-line" [class.active]="isMenuOpen()"></span>
+      <span class="hamburger-line" [class.active]="isMenuOpen()"></span>
+    </button>
 
-  <a routerLink="/" class="logo" (click)="closeMenu()">
-    <img src="assets/logo.png" alt="Logo" onerror="this.style.display='none'"/> 
-    <span class="logo-text">Ignacio Juarez</span> 
-  </a>
+    <div class="nav-links" [class.open]="isMenuOpen()">
+      <a
+        routerLink="/"
+        routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeMenu()"
+      >
+        <span class="nav-index">01</span> Series
+      </a>
+      <a routerLink="/about-us" routerLinkActive="active-link" (click)="closeMenu()">
+        <span class="nav-index">02</span> CV &amp; Bio
+      </a>
+      <a routerLink="/contact" routerLinkActive="active-link" (click)="closeMenu()">
+        <span class="nav-index">03</span> Cotizar
+      </a>
+      <a routerLink="/studio" routerLinkActive="active-link" (click)="closeMenu()" class="studio-link">
+        <span class="nav-index">04</span> Estudio
+      </a>
+    </div>
 
-  <div class="nav-links" [class.open]="isMenuOpen()">
-    <a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}" (click)="closeMenu()">Home</a>
-    <a routerLink="/about-us" routerLinkActive="active-link" (click)="closeMenu()">About Us</a>
-    <a routerLink="/contact" routerLinkActive="active-link" (click)="closeMenu()">Contact</a>
-  </div>
-
-  <div class="social-media">
-    <a href="https://www.instagram.com/igna99s/" target="_blank">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M16.65 7.2H16.66M8 20H16C18.2091 20 20 18.2091 20 16V8C20 5.79086 18.2091 4 16 4H8C5.79086 4 4 5.79086 4 8V16C4 18.2091 5.79086 20 8 20ZM15.75 12C15.75 14.0711 14.0711 15.75 12 15.75C9.92893 15.75 8.25 14.0711 8.25 12C8.25 9.92893 9.92893 8.25 12 8.25C14.0711 8.25 15.75 9.92893 15.75 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-      </svg>
+    <a routerLink="/" class="logo" (click)="closeMenu()">
+      <span class="logo-text">Ignacio Juárez</span>
+      <span class="logo-sub">Fotografía &amp; Dirección Visual</span>
     </a>
-    <a href="https://ar.pinterest.com/ignacionahuel1/" target="_blank">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M7.45 13.18C6.34 10.92 7.85 6.51 12.92 7.23C18.51 8.03 17.51 16.71 12.85 16.37C11.37 16.26 10.82 15.04 10.67 13.79M10.67 13.79C10.56 12.85 10.69 11.89 10.83 11.38C11.07 10.53 11.48 10.64 11.18 11.78C11.04 12.33 10.86 13.02 10.67 13.79ZM10.67 13.79C10.16 15.85 9.52 18.48 9.04 20.5M9.04 20.5C9.97 20.82 10.96 21 12 21C16.97 21 21 16.97 21 12C21 7.03 16.97 3 12 3C7.03 3 3 7.03 3 12C3 15.93 5.52 19.28 9.04 20.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </a>
-  </div>
-</div>
+
+    <div class="nav-actions">
+      <button
+        type="button"
+        class="moodboard-trigger"
+        (click)="openMoodboard()"
+        title="Abrir Mesa de Luz (Selección de fotografías para tu proyecto)"
+      >
+        <span class="moodboard-dot" [class.has-items]="moodboard.count() > 0"></span>
+        <span class="moodboard-label">Mesa de Luz</span>
+        <span class="moodboard-count">{{ moodboard.count() }}</span>
+      </button>
+
+      <button
+        type="button"
+        class="theme-toggle-btn"
+        (click)="toggleTheme()"
+        [attr.aria-label]="
+          portfolioState.isDarkroomMode() ? 'Cambiar a Luz de Estudio' : 'Cambiar a Cuarto Oscuro'
+        "
+        [title]="
+          portfolioState.isDarkroomMode()
+            ? 'Modo activo: Cuarto Oscuro (Click para Luz de Estudio)'
+            : 'Modo activo: Papel Editorial (Click para Cuarto Oscuro)'
+        "
+      >
+        @if (portfolioState.isDarkroomMode()) {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <circle cx="12" cy="12" r="4.5" />
+            <path
+              d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"
+              stroke-linecap="round"
+            />
+          </svg>
+        } @else {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path
+              d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        }
+      </button>
+
+      <div class="social-media">
+        <a
+          href="https://www.instagram.com/igna99s/"
+          target="_blank"
+          rel="noopener"
+          aria-label="Instagram de Ignacio Juárez"
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M16.65 7.2H16.66M8 20H16C18.2091 20 20 18.2091 20 16V8C20 5.79086 18.2091 4 16 4H8C5.79086 4 4 5.79086 4 8V16C4 18.2091 5.79086 20 8 20ZM15.75 12C15.75 14.0711 14.0711 15.75 12 15.75C9.92893 15.75 8.25 14.0711 8.25 12C8.25 9.92893 9.92893 8.25 12 8.25C14.0711 8.25 15.75 9.92893 15.75 12Z"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </a>
+        <a
+          href="https://ar.pinterest.com/ignacionahuel1/"
+          target="_blank"
+          rel="noopener"
+          aria-label="Pinterest de Ignacio Juárez"
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M7.45 13.18C6.34 10.92 7.85 6.51 12.92 7.23C18.51 8.03 17.51 16.71 12.85 16.37C11.37 16.26 10.82 15.04 10.67 13.79M10.67 13.79C10.56 12.85 10.69 11.89 10.83 11.38C11.07 10.53 11.48 10.64 11.18 11.78C11.04 12.33 10.86 13.02 10.67 13.79ZM10.67 13.79C10.16 15.85 9.52 18.48 9.04 20.5M9.04 20.5C9.97 20.82 10.96 21 12 21C16.97 21 21 16.97 21 12C21 7.03 16.97 3 12 3C7.03 3 3 7.03 3 12C3 15.93 5.52 19.28 9.04 20.5Z"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </nav>
+</header>

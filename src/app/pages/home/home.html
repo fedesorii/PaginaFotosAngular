@@ -1,12 +1,176 @@
-<div class="gallery-container">
-  @for (item of galleries(); track item.id) {
-    <a [routerLink]="['/gallery', item.id]" class="gallery-item">
-      <div class="image-wrapper" appReveal>
-        <img [src]="item.coverPhoto" [alt]="item.title" />
-        <div class="overlay">
-          <span class="info-text">{{ item.title }}</span>
-        </div>
+<!-- 1. ENCABEZADO EDITORIAL DE PORFOLIO / CV (Inspirado en Alex Tran & Lieben.no) -->
+<section class="hero-editorial">
+  <div class="hero-top-meta">
+    <span class="eyebrow-tag">Porfolio &amp; Currículum Visual · Buenos Aires, AR</span>
+    <span class="availability-pill">
+      <span class="status-dot"></span>
+      Disponible para Eventos, Sesiones &amp; Marcas
+    </span>
+  </div>
+
+  <div class="hero-grid">
+    <div class="hero-headline-col">
+      <h1 class="hero-title">
+        Historias visuales con <em>impronta analógica</em> y luz propia.
+      </h1>
+    </div>
+
+    <div class="hero-pitch-col">
+      <p class="hero-lead">
+        Soy <strong>Ignacio Juárez</strong>, fotógrafo autónomo especializado en
+        <strong>cobertura documental de eventos</strong>,
+        <strong>fotografía gastronómica de producto</strong>, <strong>retratos</strong> y
+        <strong>crónicas de paisaje</strong>. Cada carpeta reúne la atmósfera real de una sesión o
+        evento para ayudarte a imaginar cómo contar la historia de tu próximo proyecto.
+      </p>
+      <div class="hero-quick-links">
+        <a routerLink="/contact" class="btn-editorial btn-editorial--solid">
+          Cotizar Evento o Sesión
+        </a>
+        <a routerLink="/about-us" class="btn-editorial">Ver CV &amp; Trayectoria</a>
       </div>
-    </a>
-  }
-</div>
+    </div>
+  </div>
+
+  <!-- Barra de filtros de carpetas y control de desnivel del collage -->
+  <div class="catalog-toolbar">
+    <div class="filter-pills" role="tablist" aria-label="Filtrar carpetas por especialidad">
+      @for (cat of categories; track cat.id) {
+        <button
+          type="button"
+          role="tab"
+          class="filter-pill"
+          [class.active]="portfolio.activeCategory() === cat.id"
+          [attr.aria-selected]="portfolio.activeCategory() === cat.id"
+          (click)="selectCategory(cat.id)"
+        >
+          {{ cat.label }}
+        </button>
+      }
+    </div>
+
+    <div class="toolbar-meta">
+      <span class="catalog-counter">
+        {{ galleries().length }} carpetas · {{ portfolio.totalPhotosCount() }} placas de archivo
+      </span>
+      <button
+        type="button"
+        class="rhythm-toggle"
+        (click)="toggleCollageRhythm()"
+        title="Alternar nivel de desfase vertical entre columnas"
+      >
+        {{ collageRhythm() === 'staggered' ? 'Grilla: Collage con Desnivel' : 'Grilla: Editorial Uniforme' }}
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- 2. GRILLA COLLAGE CON DESNIVEL DE PORTADAS (Inspirado en alextranphotography.com & levonbiss.com) -->
+<section class="collage-section" aria-label="Archivo de carpetas y sesiones fotográficas">
+  <div
+    class="gallery-container"
+    [class.staggered-collage]="collageRhythm() === 'staggered'"
+  >
+    @for (item of galleries(); track item.id; let idx = $index) {
+      <a
+        [routerLink]="['/gallery', item.id]"
+        class="gallery-item"
+        [attr.data-aspect]="item.coverAspectVariant"
+        [attr.data-col]="(idx % 4) + 1"
+      >
+        <article class="image-wrapper watermarked-stage" appReveal [revealIndex]="idx">
+          <img
+            [src]="item.coverPhotoUrl"
+            [alt]="item.title + ' — ' + item.subtitle"
+            loading="lazy"
+            decoding="async"
+          />
+
+          @if (portfolio.runtimeConfig().watermarkEnabled) {
+            <span class="discrete-watermark">
+              {{ portfolio.runtimeConfig().watermarkText }}
+            </span>
+          }
+
+          <!-- Capa interactiva en Hover con Título, Descripción Breve y Metadatos -->
+          <div class="overlay">
+            <div class="overlay-top">
+              <span class="folder-index">CARPETA {{ item.indexNumber }}</span>
+              <span class="folder-category">{{ item.categoryLabel }}</span>
+            </div>
+
+            <div class="overlay-center">
+              <h2 class="info-text">{{ item.title }}</h2>
+              <p class="info-subtitle">{{ item.subtitle }}</p>
+              <p class="info-summary">{{ item.summary }}</p>
+            </div>
+
+            <div class="overlay-bottom">
+              <span class="folder-location">{{ item.location }} · {{ item.year }}</span>
+              <span class="folder-cta">{{ item.photoCount }} PLACAS →</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Pie editorial visible en mobile/tablet y como referencia sutil bajo cada portada -->
+        <div class="card-caption-bar">
+          <div class="caption-left">
+            <span class="caption-idx">{{ item.indexNumber }}</span>
+            <span class="caption-title">{{ item.title }}</span>
+          </div>
+          <span class="caption-count">{{ item.photoCount }} fotos</span>
+        </div>
+      </a>
+    }
+  </div>
+</section>
+
+<!-- 3. SECCIÓN CV COMERCIAL: SERVICIOS & PROPUESTA DE VALOR (Inspirado en Lieben.no) -->
+<section class="services-cv-section">
+  <div class="services-header">
+    <div>
+      <span class="eyebrow-tag">Propuesta de Valor &amp; Servicios</span>
+      <h2 class="section-display-title">
+        ¿Qué tipo de producción necesita tu marca o evento?
+      </h2>
+    </div>
+    <p class="services-intro">
+      Cada cobertura se diseña a medida combinando dirección de arte previa, sensibilidad
+      documental en el rodaje y revelado autoral placa por placa.
+    </p>
+  </div>
+
+  <div class="services-grid">
+    @for (srv of portfolio.profile().services; track srv.id) {
+      <article class="service-card" appReveal>
+        <div class="service-card-top">
+          <span class="service-code">{{ srv.code }}</span>
+          <span class="service-turnaround">Entrega: {{ srv.turnaround }}</span>
+        </div>
+
+        <h3 class="service-title">{{ srv.title }}</h3>
+        <p class="service-subtitle">{{ srv.subtitle }}</p>
+        <p class="service-desc">{{ srv.description }}</p>
+
+        <ul class="service-deliverables">
+          @for (deliv of srv.deliverables; track deliv) {
+            <li>{{ deliv }}</li>
+          }
+        </ul>
+
+        <div class="service-actions">
+          <a [routerLink]="['/gallery', srv.sampleFolderId]" class="service-sample-link">
+            Ver carpeta de ejemplo →
+          </a>
+          <a
+            routerLink="/contact"
+            [queryParams]="{ service: srv.title }"
+            class="btn-editorial"
+          >
+            Solicitar Cotización
+          </a>
+        </div>
+      </article>
+    }
+  </div>
+</section>

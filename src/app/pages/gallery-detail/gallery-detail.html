@@ -1,26 +1,407 @@
-<div id="gallery-detail">
-  @if (info()) {
-    <h1>{{ info().title }}</h1>
+<article class="folder-page" id="gallery-detail">
+  @if (folder(); as currentFolder) {
+    <!-- 1. RESUMEN SUPERIOR EDITORIAL (Inspirado en levonbiss.com/microsculpture) -->
+    <header class="folder-hero">
+      <div class="folder-breadcrumb-bar">
+        <a routerLink="/" class="back-link">← Volver al Archivo de Portadas</a>
+        <div class="folder-index-badges">
+          <span class="badge-mono">CARPETA Nº {{ currentFolder.indexNumber }}</span>
+          <span class="badge-category">{{ currentFolder.categoryLabel }}</span>
+        </div>
+      </div>
 
-    @if (photos().length > 0) {
-      <div class="grid-photos">
-        @for (photo of photos(); track $index) {
-          <div class="photo-item" appReveal (click)="openLightbox(photo)" style="cursor: zoom-in;">
-            <img [src]="photo" alt="Fotografía del evento" />
+      <div class="folder-summary-grid">
+        <div class="folder-title-col">
+          <h1 class="folder-title">{{ currentFolder.title }}</h1>
+          <p class="folder-subtitle">{{ currentFolder.subtitle }}</p>
+
+          <dl class="folder-quick-meta">
+            <div>
+              <dt>Locación</dt>
+              <dd>{{ currentFolder.location }}</dd>
+            </div>
+            <div>
+              <dt>Año</dt>
+              <dd>{{ currentFolder.year }}</dd>
+            </div>
+            <div>
+              <dt>Contexto / Cliente</dt>
+              <dd>{{ currentFolder.clientOrContext }}</dd>
+            </div>
+            <div>
+              <dt>Archivo</dt>
+              <dd>{{ allPhotos().length }} Placas de Alta Resolución</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="folder-narrative-col">
+          <!-- Leve descripción principal -->
+          <p class="folder-lead-summary">{{ currentFolder.summary }}</p>
+
+          <!-- Acordeón desplegable "Read more..." al estilo Levon Biss Microsculpture -->
+          <div class="microsculpture-accordion" [class.expanded]="isReadMoreExpanded()">
+            <button
+              type="button"
+              class="accordion-trigger"
+              (click)="toggleReadMore()"
+              [attr.aria-expanded]="isReadMoreExpanded()"
+            >
+              <span>
+                {{
+                  isReadMoreExpanded()
+                    ? 'Ocultar notas de producción y ficha técnica'
+                    : 'Leer más sobre la sesión y proceso técnico...'
+                }}
+              </span>
+              <span class="accordion-arrow" [class.open]="isReadMoreExpanded()">↓</span>
+            </button>
+
+            @if (isReadMoreExpanded()) {
+              <div class="accordion-content">
+                @for (paragraph of currentFolder.extendedNotes; track $index) {
+                  <p class="extended-paragraph">{{ paragraph }}</p>
+                }
+
+                <div class="technical-sheet">
+                  <div class="tech-item">
+                    <span class="tech-label">Cámara &amp; Formato</span>
+                    <span class="tech-val">{{ currentFolder.technicalSpecs.camera }}</span>
+                  </div>
+                  <div class="tech-item">
+                    <span class="tech-label">Óptica Utilizada</span>
+                    <span class="tech-val">{{ currentFolder.technicalSpecs.optics }}</span>
+                  </div>
+                  <div class="tech-item">
+                    <span class="tech-label">Iluminación</span>
+                    <span class="tech-val">{{ currentFolder.technicalSpecs.lighting }}</span>
+                  </div>
+                  <div class="tech-item">
+                    <span class="tech-label">Colorimetría</span>
+                    <span class="tech-val">{{ currentFolder.technicalSpecs.colorProfile }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de herramientas de visualización y Lazy Computing -->
+      <div class="folder-ActionBar">
+        <div class="view-switcher" role="group" aria-label="Modo de vista de la carpeta">
+          <button
+            type="button"
+            class="view-btn"
+            [class.active]="viewMode() === 'collage'"
+            (click)="setViewMode('collage')"
+          >
+            Grilla Collage (Desnivel)
+          </button>
+          <button
+            type="button"
+            class="view-btn"
+            [class.active]="viewMode() === 'contact-sheet'"
+            (click)="setViewMode('contact-sheet')"
+          >
+            Hoja de Contacto (35mm)
+          </button>
+        </div>
+
+        <div class="lazy-telemetry">
+          <span class="telemetry-indicator"></span>
+          <span>
+            Lazy Computing: {{ visiblePhotos().length }} / {{ allPhotos().length }} placas activas
+          </span>
+        </div>
+
+        <div class="folder-cta-group">
+          <button
+            type="button"
+            class="btn-editorial"
+            (click)="openLightboxAt(0)"
+            [disabled]="allPhotos().length === 0"
+          >
+            Maximizar Serie (01 / {{ formatIndex(allPhotos().length) }})
+          </button>
+          <a
+            routerLink="/contact"
+            [queryParams]="{ service: currentFolder.categoryLabel }"
+            class="btn-editorial btn-editorial--solid"
+          >
+            Cotizar Sesión Similar →
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. GRILLA DE FOTOGRAFÍAS CON DESNIVEL (COLLAGE) O HOJA DE CONTACTO -->
+    @if (allPhotos().length > 0) {
+      <section
+        class="photos-section"
+        [class.mode-collage]="viewMode() === 'collage'"
+        [class.mode-contact-sheet]="viewMode() === 'contact-sheet'"
+        aria-label="Fotografías de la carpeta"
+      >
+        <div class="grid-photos">
+          @for (photo of visiblePhotos(); track photo.id; let idx = $index) {
+            <figure
+              class="photo-item"
+              [attr.data-aspect]="photo.aspectVariant"
+              tabindex="0"
+              role="button"
+              [attr.aria-label]="'Ampliar fotografía ' + photo.title"
+              appReveal
+              [revealIndex]="idx"
+              (click)="openLightboxAt(idx)"
+              (keydown.enter)="openLightboxAt(idx)"
+              (keydown.space)="openLightboxAt(idx); $event.preventDefault()"
+            >
+              <div
+                class="photo-frame watermarked-stage"
+                (contextmenu)="$event.preventDefault()"
+              >
+                <img
+                  [src]="photo.thumbUrl"
+                  [alt]="photo.title + ' — ' + currentFolder.title"
+                  loading="lazy"
+                  decoding="async"
+                />
+
+                @if (portfolio.runtimeConfig().watermarkEnabled) {
+                  <span class="discrete-watermark">
+                    {{ photo.watermarkText }}
+                  </span>
+                }
+
+                <!-- Capa sutil en Hover para hacer Focus o guardar en Mesa de Luz -->
+                <div class="photo-hover-layer">
+                  <div class="photo-hover-top">
+                    <span class="plate-number">PLACA #{{ formatIndex(photo.index) }}</span>
+                    <button
+                      type="button"
+                      class="moodboard-pin-btn"
+                      [class.selected]="moodboard.isSelected(photo.id)"
+                      (click)="toggleMoodboardItem(photo, $event)"
+                      title="Guardar como referencia en tu Mesa de Luz"
+                    >
+                      {{ moodboard.isSelected(photo.id) ? '✓ En Mesa de Luz' : '+ Mesa de Luz' }}
+                    </button>
+                  </div>
+
+                  <div class="photo-hover-bottom">
+                    <div>
+                      <h3 class="photo-card-title">{{ photo.title }}</h3>
+                      <span class="photo-card-exif">
+                        {{ photo.metadata.focalLength || '50mm' }} ·
+                        {{ photo.metadata.aperture || 'f/2.8' }} ·
+                        {{ photo.metadata.filmStock || 'Edición Autoral' }}
+                      </span>
+                    </div>
+                    <span class="focus-icon" title="Ampliar fotografía">⤢ Focus</span>
+                  </div>
+                </div>
+              </div>
+
+              <figcaption class="photo-caption-bar">
+                <span class="caption-num">{{ formatIndex(photo.index) }}</span>
+                <span class="caption-name">{{ photo.title }}</span>
+                <span class="caption-loc">{{ photo.metadata.location }}</span>
+              </figcaption>
+            </figure>
+          }
+        </div>
+
+        @if (hasMoreToCompute()) {
+          <div class="lazy-load-more-wrap">
+            <button type="button" class="btn-editorial" (click)="computeNextBatch()">
+              Cargar siguientes placas ({{ visiblePhotos().length }} de {{ allPhotos().length }})
+            </button>
           </div>
         }
+      </section>
+    } @else if (isLoading()) {
+      <div class="loading-state">
+        <p class="loading-title">Revelando placas de archivo en alta definición...</p>
       </div>
-    } @else {
-      <p>Cargando fotografías de alta calidad...</p>
     }
-  } @else {
-    <h2>Lo siento, esta galería no existe.</h2>
-  }
-</div>
 
-@if (isLightboxOpen()) {
-  <div class="lightbox-overlay" (click)="closeLightbox()">
-    <button class="close-btn" (click)="closeLightbox()" aria-label="Cerrar imagen">Cerrar</button>
-    <img [src]="selectedImage()" alt="vista ampliada de la fotografía" class="lightbox-img" (click)="$event.stopPropagation()"/>
+    <!-- 3. NAVEGACIÓN ENTRE CARPETAS (EXHIBICIÓN CONTINUA) -->
+    @if (adjacentFolders(); as adj) {
+      <nav class="adjacent-folders-nav" aria-label="Recorrer otras carpetas del porfolio">
+        @if (adj.prev) {
+          <a [routerLink]="['/gallery', adj.prev.id]" class="adj-card adj-prev">
+            <span class="adj-direction">← Carpeta Anterior</span>
+            <span class="adj-title">{{ adj.prev.title }}</span>
+            <span class="adj-sub">{{ adj.prev.categoryLabel }} · {{ adj.prev.photoCount }} placas</span>
+          </a>
+        }
+        @if (adj.next) {
+          <a [routerLink]="['/gallery', adj.next.id]" class="adj-card adj-next">
+            <span class="adj-direction">Siguiente Carpeta →</span>
+            <span class="adj-title">{{ adj.next.title }}</span>
+            <span class="adj-sub">{{ adj.next.categoryLabel }} · {{ adj.next.photoCount }} placas</span>
+          </a>
+        }
+      </nav>
+    }
+  } @else if (!isLoading()) {
+    <section class="not-found-box">
+      <h2>Esta carpeta no se encuentra en el archivo.</h2>
+      <a routerLink="/" class="btn-editorial">Volver al inicio</a>
+    </section>
+  }
+</article>
+
+<!-- ==========================================================================
+     4. MODAL DE FOCUS / LIGHTBOX CON MARCA DE AGUA DISCRETA Y DESPLAZAMIENTO 1 A 1
+        (Inspirado en Levon Biss Microsculpture)
+     ========================================================================== -->
+@if (isLightboxOpen() && activePhoto(); as currentPhoto) {
+  <div
+    class="lightbox-overlay"
+    (click)="closeLightbox()"
+    (touchstart)="onTouchStart($event)"
+    (touchend)="onTouchEnd($event)"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Vista maximizada de fotografía"
+  >
+    <!-- Barra Superior de Cámara Oscura -->
+    <header class="lightbox-topbar" (click)="$event.stopPropagation()">
+      <div class="lightbox-series-info">
+        <span class="lb-counter">
+          {{ formatIndex(activeIndex() + 1) }} / {{ formatIndex(allPhotos().length) }}
+        </span>
+        <span class="lb-divider">—</span>
+        <span class="lb-folder-title">{{ folder()?.title }}</span>
+      </div>
+
+      <div class="lightbox-controls">
+        <button
+          type="button"
+          class="lb-tool-btn"
+          [class.active]="moodboard.isSelected(currentPhoto.id)"
+          (click)="toggleMoodboardItem(currentPhoto, $event)"
+        >
+          {{
+            moodboard.isSelected(currentPhoto.id)
+              ? '✓ Guardada en Mesa de Luz'
+              : '+ Guardar en Mesa de Luz'
+          }}
+        </button>
+
+        <button
+          type="button"
+          class="lb-tool-btn"
+          [class.active]="isZoomed()"
+          (click)="toggleZoom($event)"
+          title="Atajo de teclado: Z"
+        >
+          {{ isZoomed() ? 'Alejar Lupa (1x)' : 'Lupa Óptica (2x)' }}
+        </button>
+
+        <button
+          type="button"
+          class="lb-tool-btn"
+          [class.active]="showExifPanel()"
+          (click)="toggleExif($event)"
+          title="Atajo de teclado: I"
+        >
+          Ficha Técnica
+        </button>
+
+        <button
+          type="button"
+          class="close-btn"
+          (click)="closeLightbox()"
+          aria-label="Cerrar vista ampliada"
+        >
+          Cerrar [ESC] ✕
+        </button>
+      </div>
+    </header>
+
+    <!-- Escenario Central con Navegación 1 por 1 y Marca de Agua Discreta -->
+    <div class="lightbox-stage" (click)="$event.stopPropagation()">
+      <button
+        type="button"
+        class="lb-nav-arrow lb-nav-prev"
+        (click)="prevPhoto($event)"
+        aria-label="Fotografía anterior"
+        title="Anterior (Flecha Izquierda)"
+      >
+        ←
+      </button>
+
+      <div
+        class="lightbox-image-container watermarked-stage"
+        [class.zoomed]="isZoomed()"
+        (click)="toggleZoom($event)"
+        (contextmenu)="$event.preventDefault()"
+      >
+        <img
+          [src]="currentPhoto.highResUrl"
+          [alt]="currentPhoto.title"
+          class="lightbox-img"
+        />
+
+        @if (portfolio.runtimeConfig().watermarkEnabled) {
+          <!-- Sello diagonal sutil en el centro y firma discreta en esquina -->
+          <span class="discrete-watermark--center-seal">
+            {{ currentPhoto.watermarkText }}
+          </span>
+          <span class="discrete-watermark">
+            {{ currentPhoto.watermarkText }} · PLACA #{{ formatIndex(currentPhoto.index) }}
+          </span>
+        }
+      </div>
+
+      <button
+        type="button"
+        class="lb-nav-arrow lb-nav-next"
+        (click)="nextPhoto($event)"
+        aria-label="Siguiente fotografía"
+        title="Siguiente (Flecha Derecha)"
+      >
+        →
+      </button>
+    </div>
+
+    <!-- Pie del Lightbox: Ficha EXIF + Tira de Negativos (Filmstrip) para desplazarse una por una -->
+    <footer class="lightbox-bottombar" (click)="$event.stopPropagation()">
+      @if (showExifPanel()) {
+        <div class="lb-caption-row">
+          <div class="lb-caption-text">
+            <h3 class="lb-photo-title">{{ currentPhoto.title }}</h3>
+            <p class="lb-photo-desc">{{ currentPhoto.caption }}</p>
+          </div>
+
+          <div class="lb-exif-pills">
+            <span>{{ currentPhoto.metadata.location || folder()?.location }}</span>
+            <span>{{ currentPhoto.metadata.focalLength || '50mm' }}</span>
+            <span>{{ currentPhoto.metadata.aperture || 'f/2.8' }}</span>
+            <span>{{ currentPhoto.metadata.shutterSpeed || '1/500s' }}</span>
+            <span>{{ currentPhoto.metadata.iso || 'ISO 200' }}</span>
+            <span>{{ currentPhoto.metadata.filmStock || 'Color Autoral' }}</span>
+          </div>
+        </div>
+      }
+
+      <div class="lb-filmstrip" role="listbox" aria-label="Miniaturas de la carpeta">
+        @for (thumb of allPhotos(); track thumb.id; let tIdx = $index) {
+          <button
+            type="button"
+            class="filmstrip-thumb"
+            [class.active]="tIdx === activeIndex()"
+            (click)="selectFilmstripPhoto(tIdx, $event)"
+            [attr.aria-label]="'Ir a fotografía ' + (tIdx + 1)"
+          >
+            <img [src]="thumb.thumbUrl" [alt]="thumb.title" loading="lazy" />
+            <span class="filmstrip-idx">{{ formatIndex(tIdx + 1) }}</span>
+          </button>
+        }
+      </div>
+    </footer>
   </div>
 }

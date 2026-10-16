@@ -1,171 +1,605 @@
-/* Contenedor principal con margen grande */
-.gallery-container {
+/* ==========================================================================
+   1. HERO EDITORIAL DE PRESENTACIÓN (CV & FILTROS)
+   ========================================================================== */
+
+.hero-editorial {
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 2.8rem 3vw 1.5rem;
+}
+
+.hero-top-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.6rem;
+}
+
+.availability-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.85rem;
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #3b8a5a;
+}
+
+.hero-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* En escritorio: 4 columnas iguales */
-  grid-auto-rows: 4.5vw; /* ALTURA BASE DE LAS IMÁGENES */
-  gap: 2.5vw;
-  padding: 30px;
-  /* padding-top: 0; */
-  grid-auto-flow: dense;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 3.5rem;
+  align-items: end;
+  padding-bottom: 2.4rem;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
-/* Cada tarjeta de galería */
-.gallery-item {
-  position: relative;
-  overflow: hidden;
-  display: block;
-  grid-row: span 5;
-  text-decoration: none;
-  color: white;
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 4.6vw, 4.4rem);
+  font-weight: 300;
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--text-primary);
 }
 
-/* --- REGLA 1: FORZAR COLUMNAS --- */
-/* Esto obliga a que vaya en su columna correspondiente */
-/* Crea 4 "torres" verticales independientes */
-/* Ciclo de 8 fotos que se repite eternamente (8n) */
-
-.gallery-item:nth-child(4n + 1) {
-  grid-column: 1;
-}
-.gallery-item:nth-child(4n + 2) {
-  grid-column: 2;
-}
-.gallery-item:nth-child(4n + 3) {
-  grid-column: 3;
-}
-.gallery-item:nth-child(4n + 4) {
-  grid-column: 4;
+.hero-title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--accent-terracotta);
 }
 
-/* --- REGLA 2: EL RITMO DE ALTURAS (El patrón de Jordi) --- */
-/* La 2da y 4ta foto son mas altas para generar un desfase arrastrado */
-
-/* Columna 1 y 3 empiezan con ALTAS */
-.gallery-item:nth-child(1),
-.gallery-item:nth-child(3) {
-  grid-row: span 4;
+.hero-lead {
+  font-size: 0.98rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  margin: 0 0 1.4rem;
 }
 
-.image-wrapper,
-.image-wrapper img {
-  width: 100%;
-  height: 100%;
+.hero-lead strong {
+  color: var(--text-primary);
+  font-weight: 500;
 }
 
-/* Contenedor de la imagen para el efecto de hover */
-
-.image-wrapper img {
-  object-fit: cover;
-  object-position: center;
-  transition: transform 0.6s ease;
+.hero-quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
 }
 
-/* Capa oscura con información (Efecto primera imagen) */
-.overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+/* --- BARRA DE FILTROS --- */
+.catalog-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  padding: 1.4rem 0 0.6rem;
+}
+
+.filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filter-pill {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-editorial);
+}
+
+.filter-pill:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.filter-pill.active {
+  background-color: var(--text-primary);
+  color: var(--bg-primary);
+  border-color: var(--text-primary);
+}
+
+.toolbar-meta {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 1rem;
+}
+
+.catalog-counter {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.rhythm-toggle {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.45rem 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.25s ease;
+}
+
+.rhythm-toggle:hover {
+  border-color: var(--accent-terracotta);
+  color: var(--text-primary);
+}
+
+/* ==========================================================================
+   2. GRILLA COLLAGE CON DESNIVEL ENTRE COLUMNAS
+      (Inspirada en alextranphotography.com & levonbiss.com)
+   ========================================================================== */
+
+.collage-section {
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 1.5rem 3vw 5rem;
+}
+
+.gallery-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2.4vw;
+  align-items: start;
+}
+
+/* Cada tarjeta de portada */
+.gallery-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.5s var(--ease-editorial);
+}
+
+/* --- DESNIVEL ENTRE COLUMNAS (ESENCIA DE COLLAGE) ---
+   Cada columna arranca a una altura distinta y combina relaciones de aspecto
+   variables (tall, portrait, editorial, compact) para lograr el ritmo orgánico
+   de Alex Tran Photography y Levon Biss. */
+.gallery-container.staggered-collage {
+  padding-bottom: 5rem;
+}
+
+.gallery-container.staggered-collage .gallery-item:nth-child(4n + 1) {
+  translate: 0 0;
+}
+
+.gallery-container.staggered-collage .gallery-item:nth-child(4n + 2) {
+  translate: 0 3.6rem;
+}
+
+.gallery-container.staggered-collage .gallery-item:nth-child(4n + 3) {
+  translate: 0 1.4rem;
+}
+
+.gallery-container.staggered-collage .gallery-item:nth-child(4n + 4) {
+  translate: 0 5rem;
+}
+
+/* Variación de proporciones para acentuar el collage asimétrico */
+.image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5.6;
+  overflow: hidden;
+  background-color: var(--bg-card);
+  box-shadow: var(--shadow-soft);
+  transition: box-shadow 0.5s var(--ease-editorial);
+}
+
+.gallery-item[data-aspect='tall'] .image-wrapper {
+  aspect-ratio: 3.6 / 5.6;
+}
+
+.gallery-item[data-aspect='portrait'] .image-wrapper {
+  aspect-ratio: 4 / 5.4;
+}
+
+.gallery-item[data-aspect='editorial'] .image-wrapper {
+  aspect-ratio: 4 / 4.8;
+}
+
+.gallery-item[data-aspect='compact'] .image-wrapper {
+  aspect-ratio: 4 / 4.4;
+}
+
+.gallery-item[data-aspect='landscape'] .image-wrapper {
+  aspect-ratio: 6 / 5;
+}
+
+.image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition:
+    transform 0.85s var(--ease-editorial),
+    filter 0.6s ease;
+}
+
+/* --- CAPA EDITORIAL EN HOVER CON TÍTULO Y DESCRIPCIÓN --- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: linear-gradient(
+    180deg,
+    rgba(12, 12, 11, 0.58) 0%,
+    rgba(12, 12, 11, 0.42) 45%,
+    rgba(12, 12, 11, 0.88) 100%
+  );
+  color: #f7f4ee;
+  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.42s var(--ease-editorial);
+}
+
+.overlay-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(247, 244, 238, 0.78);
+  transform: translateY(-8px);
+  transition: transform 0.45s var(--ease-editorial);
+}
+
+.folder-category {
+  padding: 0.2rem 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.overlay-center {
+  margin: auto 0;
+  transform: translateY(12px);
+  transition: transform 0.45s var(--ease-editorial);
 }
 
 .info-text {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.5rem;
-  text-align: center;
-  padding: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  font-family: var(--font-serif);
+  font-size: clamp(1.55rem, 2vw, 2.15rem);
+  font-weight: 400;
+  line-height: 1.15;
+  margin: 0 0 0.4rem;
+  color: #ffffff;
 }
 
-/* Estados al pasar el mouse */
-.gallery-item:hover .overlay {
+.info-subtitle {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.98rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 0.75rem;
+}
+
+.info-summary {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: rgba(245, 242, 235, 0.78);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.overlay-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transform: translateY(8px);
+  transition: transform 0.45s var(--ease-editorial);
+}
+
+.folder-cta {
+  color: #f3c19d;
+  font-weight: 500;
+}
+
+/* Interacción Hover & Focus Teclado */
+.gallery-item:focus-visible {
+  outline: 2px solid var(--accent-terracotta);
+  outline-offset: 4px;
+}
+
+.gallery-item:hover .image-wrapper,
+.gallery-item:focus-visible .image-wrapper {
+  box-shadow: var(--shadow-hover);
+}
+
+.gallery-item:hover .overlay,
+.gallery-item:focus-visible .overlay {
   opacity: 1;
 }
 
-.gallery-item:hover img {
-  transform: scale(1.05);
+.gallery-item:hover .overlay-top,
+.gallery-item:hover .overlay-center,
+.gallery-item:hover .overlay-bottom,
+.gallery-item:focus-visible .overlay-top,
+.gallery-item:focus-visible .overlay-center,
+.gallery-item:focus-visible .overlay-bottom {
+  transform: translateY(0);
 }
 
-/* ------------------ */
-/* --- RESPONSIVE --- */
-/* ------------------ */
-
-@media (max-width: 900px) {
-  .info-text {
-    font-size: 1.2rem;
-  }
+.gallery-item:hover img,
+.gallery-item:focus-visible img {
+  transform: scale(1.06);
 }
 
-/* Tabletas: Pasamos a 3 columnas, manteniendo el ritmo */
-@media (max-width: 600px) {
+/* Pie sutil bajo cada tarjeta */
+.card-caption-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.75rem 0.15rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.55rem;
+}
+
+.caption-left {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+}
+
+.caption-idx {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--accent-terracotta);
+}
+
+.caption-title {
+  font-family: var(--font-serif);
+  font-size: 1.12rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.caption-count {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   3. SECCIÓN CV COMERCIAL: SERVICIOS
+   ========================================================================== */
+
+.services-cv-section {
+  max-width: 1680px;
+  margin: 2rem auto 0;
+  padding: 4.5rem 3vw 2rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.services-header {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 3rem;
+  align-items: end;
+  margin-bottom: 3rem;
+}
+
+.section-display-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 3.2vw, 3rem);
+  font-weight: 300;
+  line-height: 1.15;
+  margin: 0.5rem 0 0;
+}
+
+.services-intro {
+  font-size: 0.96rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.service-card {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  padding: 2.2rem;
+  display: flex;
+  flex-direction: column;
+  transition:
+    border-color 0.35s ease,
+    transform 0.35s var(--ease-editorial);
+}
+
+.service-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-4px);
+}
+
+.service-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent-terracotta);
+  margin-bottom: 1.1rem;
+}
+
+.service-turnaround {
+  color: var(--text-muted);
+}
+
+.service-title {
+  font-family: var(--font-serif);
+  font-size: 1.65rem;
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0 0 0.4rem;
+}
+
+.service-subtitle {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+}
+
+.service-desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 1.2rem;
+}
+
+.service-deliverables {
+  padding-left: 1.1rem;
+  margin: 0 0 1.8rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  flex: 1;
+}
+
+.service-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.service-sample-link {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-terracotta);
+  text-decoration: none;
+}
+
+.service-sample-link:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 1200px) {
   .gallery-container {
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    gap: 2.2rem;
   }
 
-  /* Reseteamos las columnas forzadas de escritorio */
-  .gallery-item:nth-child(n) {
-    grid-column: auto;
+  .gallery-container.staggered-collage .gallery-item:nth-child(n) {
+    translate: 0 0;
   }
 
-  /* Reset de alturas */
-  .gallery-item:nth-child(n) { grid-row: span 5; }
-
-  /* Nuevo patrón para 3 columnas: La primera y tercera foto son altas */
-  .gallery-item:nth-child(1) {
-    grid-row: span 4;
+  .gallery-container.staggered-collage .gallery-item:nth-child(3n + 2) {
+    translate: 0 3rem;
   }
 
-  .gallery-item:nth-child(3) {
-    grid-row: span 4;
+  .gallery-container.staggered-collage .gallery-item:nth-child(3n + 3) {
+    translate: 0 1.4rem;
   }
 
-  .info-text {
-    font-size: 1.1rem;
+  .services-grid {
+    grid-template-columns: 1fr;
   }
 }
 
-/* Celulares: Pasamos a 2 columnas manteniendo el ritmo */
-@media (max-width: 450px) {
+@media (max-width: 860px) {
+  .hero-grid,
+  .services-header {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
   .gallery-container {
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    gap: 1.5rem;
   }
 
-  /* Reseteamos las columnas forzadas de escritorio */
-  .gallery-item:nth-child(n) {
-    grid-column: auto;
+  .gallery-container.staggered-collage .gallery-item:nth-child(n) {
+    translate: 0 0;
   }
 
-/* Reset de alturas */
-  .gallery-item:nth-child(n) { grid-row: span 5; }
-  
-  /* Nuevo patrón simple para 2 columnas: Uno alto, uno bajo... */
-  .gallery-item:nth-child(1) {
-    grid-row: span 4;
-  }
-
-  .info-text {
-    font-size: 1rem;
+  .gallery-container.staggered-collage .gallery-item:nth-child(2n) {
+    translate: 0 2.2rem;
   }
 }
 
-/* Móvil: 1 sola columna (lo desactivamos temporalmente por pedido de arriba*/ 
-/* @media (max-width: 400px) {
+@media (max-width: 520px) {
   .gallery-container {
     grid-template-columns: 1fr;
-    grid-auto-rows: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    gap: 2rem;
   }
-  .gallery-item {
-    height: auto;
+
+  .gallery-container.staggered-collage {
+    padding-bottom: 1rem;
   }
-} */
+
+  .gallery-container.staggered-collage .gallery-item:nth-child(n) {
+    translate: 0 0;
+  }
+
+  .overlay {
+    padding: 1.25rem;
+  }
+
+  .info-text {
+    font-size: 1.45rem;
+  }
+}

@@ -1,63 +1,243 @@
-<section class="contact-container">
-    <div class="contact-info">
-        <h1 class="contact-title">Contactar</h1>
+<section class="contact-page">
+  <div class="contact-grid">
+    <!-- COLUMNA IZQUIERDA: DATOS DE ESTUDIO & DISPONIBILIDAD -->
+    <aside class="contact-sidebar">
+      <span class="contact-eyebrow">Reserva de Fechas · Presupuestos · Editorial</span>
+      <h1 class="contact-heading">Iniciemos una conversación visual.</h1>
 
-        <blockquote class="contact-quote">"Me interesa lo que no se ve a simple vista."</blockquote>
+      <blockquote class="contact-quote">
+        "{{ portfolio.profile().manifestoQuote }}"
+      </blockquote>
 
-        <div class="info-blocks">
-            <div class="info-block">
-                <span>Email</span>
-                <a href="mailto:ignacionahuel1@hotmail.com">ignacionahuel1@hotmail.com</a>
-            </div>
-
-            <div class="info-block">
-                <span>Instagram</span>
-                <a href="https://www.instagram.com/igna99s/" target="_blank" rel="noopener">@igna99s</a>
-            </div>
-
-            <div class="info-block">
-                <span>Pinterest</span>
-                <a href="https://ar.pinterest.com/ignacionahuel1/" target="_blank" rel="noopener">@ignacionahuel1</a>
-            </div>
-
-            <div class="info-block">
-                <span>Estudio</span>
-                <p>Quilmes, Buenos Aires, Argentina</p>
-            </div>
+      <div class="availability-card">
+        <span class="status-dot"></span>
+        <div>
+          <strong>{{ portfolio.profile().availabilityText }}</strong>
+          <p>Respuesta personalizada dentro de las 24 hs hábiles con propuesta de cobertura y referencias.</p>
         </div>
-    </div>
+      </div>
 
-    <div class="contact-form-wrapper">
-        <form class="editorial-form" (submit)="onSubmit($event)">
-            <div class="form-group">
-                <input type="text" id="name" name="user_name" placeholder="Tu nombre" required>
-            </div>
+      <div class="info-blocks">
+        <div class="info-block">
+          <span class="info-label">Correo Directo</span>
+          <a [href]="'mailto:' + portfolio.profile().email">{{ portfolio.profile().email }}</a>
+        </div>
 
-            <div class="form-group">
-                <input type="email" id="email" name="user_email" placeholder="Tu email" required>
-            </div>
+        <div class="info-block">
+          <span class="info-label">Instagram</span>
+          <a [href]="portfolio.profile().instagramUrl" target="_blank" rel="noopener">
+            {{ portfolio.profile().instagramHandle }} ↗
+          </a>
+        </div>
 
-            <div class="form-group">
-                <input type="text" id="subject" name="subject" placeholder="¿De qué se trata? (Boda, evento, editorial, etc.)" required>
-            </div>
+        <div class="info-block">
+          <span class="info-label">Pinterest</span>
+          <a [href]="portfolio.profile().pinterestUrl" target="_blank" rel="noopener">
+            {{ portfolio.profile().pinterestHandle }} ↗
+          </a>
+        </div>
 
-            <div class="form-group">
-                <textarea id="message" name="message" placeholder="Cuéntame tu idea..." required></textarea>
-            </div>
+        <div class="info-block">
+          <span class="info-label">Base Operativa</span>
+          <p>{{ portfolio.profile().location }} · Disponible para viajes</p>
+        </div>
+      </div>
 
-            <button type="submit" class="btn-minimalist" [disabled]="isSending">
-                @if (isSending) {
-                    Enviando...
-                } @else if (isSent) {
-                    Mensaje enviado
-                } @else {
-                    Enviar mensaje
-                }
-            </button>
+      <div class="adapter-info-badge">
+        <span class="badge-title">Arquitectura de Despacho</span>
+        <p>
+          Adaptador activo: <strong>{{ portfolio.runtimeConfig().emailAdapter | uppercase }}</strong>.
+          Configurable desde <a routerLink="/studio">Studio Admin</a>.
+        </p>
+      </div>
+    </aside>
 
-            @if (errorMessage) {
-                <p class="error-message">{{ errorMessage }}</p>
+    <!-- COLUMNA DERECHA: FORMULARIO EDITORIAL & MESA DE LUZ ADJUNTA -->
+    <div class="contact-form-column">
+      @if (deliveryResult(); as receipt) {
+        <div class="receipt-card" role="status" aria-live="polite">
+          <div class="receipt-header">
+            <span class="receipt-tag">CONSULTA REGISTRADA · {{ receipt.referenceCode }}</span>
+            <span class="receipt-provider">Vía {{ receipt.providerName }}</span>
+          </div>
+          <h2>Gracias por tu propuesta.</h2>
+          <p class="receipt-msg">{{ receipt.userMessage }}</p>
+
+          <div class="receipt-actions">
+            @if (receipt.mailtoFallbackUrl) {
+              <a [href]="receipt.mailtoFallbackUrl" class="btn-primary-action">
+                Abrir copia en mi correo ↗
+              </a>
             }
+            <button type="button" class="btn-secondary-action" (click)="resetConfirmation()">
+              Enviar otra consulta
+            </button>
+          </div>
+        </div>
+      } @else {
+        <form class="editorial-form" (submit)="onSubmit($event)" novalidate>
+          <!-- Selector de Tipo de Proyecto -->
+          <div class="service-selector">
+            <span class="field-caption">01 · ¿Qué tipo de producción o cobertura buscás?</span>
+            <div class="service-pills" role="radiogroup" aria-label="Tipo de producción">
+              @for (option of serviceOptions; track option) {
+                <button
+                  type="button"
+                  class="service-pill"
+                  [class.active]="serviceType === option"
+                  (click)="selectService(option)"
+                >
+                  {{ option }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Datos de Contacto -->
+          <div class="form-row-two">
+            <div class="form-group">
+              <label for="clientName">02 · Nombre o Marca *</label>
+              <input
+                type="text"
+                id="clientName"
+                name="clientName"
+                [(ngModel)]="clientName"
+                placeholder="Ej. Valentina Gómez / Estudio Nómade"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="clientEmail">03 · Email de contacto *</label>
+              <input
+                type="email"
+                id="clientEmail"
+                name="clientEmail"
+                [(ngModel)]="clientEmail"
+                placeholder="nombre@dominio.com"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Fecha, Locación y Teléfono -->
+          <div class="form-row-three">
+            <div class="form-group">
+              <label for="eventDate">04 · Fecha estimada</label>
+              <input
+                type="text"
+                id="eventDate"
+                name="eventDate"
+                [(ngModel)]="eventDate"
+                placeholder="Ej. Noviembre 2026"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="eventLocation">05 · Locación / Ciudad</label>
+              <input
+                type="text"
+                id="eventLocation"
+                name="eventLocation"
+                [(ngModel)]="eventLocation"
+                placeholder="Ej. Quilmes / CABA / Salta"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="clientPhone">06 · WhatsApp / Teléfono</label>
+              <input
+                type="tel"
+                id="clientPhone"
+                name="clientPhone"
+                [(ngModel)]="clientPhone"
+                placeholder="+54 9 11 ..."
+              />
+            </div>
+          </div>
+
+          <!-- Asunto -->
+          <div class="form-group">
+            <label for="subject">07 · Título o referencia del proyecto</label>
+            <input
+              type="text"
+              id="subject"
+              name="subject"
+              [(ngModel)]="subject"
+              placeholder="Ej. Lanzamiento de carta nocturna / Aniversario de marca"
+            />
+          </div>
+
+          <!-- Mensaje -->
+          <div class="form-group">
+            <label for="message">08 · Contame la atmósfera, tiempos y objetivos *</label>
+            <textarea
+              id="message"
+              name="message"
+              [(ngModel)]="message"
+              rows="4"
+              placeholder="Describí brevemente el evento o sesión, cantidad de horas aproximadas y el uso previsto de las fotografías..."
+              required
+            ></textarea>
+          </div>
+
+          <!-- Mesa de Luz Adjunta (Moodboard del Cliente) -->
+          <div class="moodboard-attachment-box">
+            <div class="moodboard-attachment-header">
+              <div>
+                <span class="field-caption">09 · Referencias de tu Mesa de Luz ({{ moodboard.count() }})</span>
+                <p class="moodboard-sub">
+                  Las fotografías que guardaste recorriendo las carpetas se adjuntarán como referencia de estilo e iluminación.
+                </p>
+              </div>
+              <a routerLink="/" class="explore-more-link">+ Explorar series</a>
+            </div>
+
+            @if (moodboard.count() > 0) {
+              <div class="moodboard-mini-strip">
+                @for (item of moodboard.items(); track item.photoId) {
+                  <div class="moodboard-mini-chip">
+                    <img [src]="item.thumbUrl" [alt]="item.photoTitle" loading="lazy" />
+                    <div class="chip-meta">
+                      <strong>{{ item.photoTitle }}</strong>
+                      <span>{{ item.folderTitle }}</span>
+                    </div>
+                    <button
+                      type="button"
+                      class="chip-remove"
+                      (click)="moodboard.removePhoto(item.photoId)"
+                      title="Quitar de la selección"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="moodboard-empty-hint">
+                <span>Sin referencias adjuntas aún. Podés marcar fotos con el ícono <strong>+ Mesa de Luz</strong> en cualquier carpeta.</span>
+              </div>
+            }
+          </div>
+
+          @if (errorMessage()) {
+            <p class="error-message" role="alert">{{ errorMessage() }}</p>
+          }
+
+          <div class="submit-row">
+            <button type="submit" class="btn-submit-proposal" [disabled]="isSending()">
+              @if (isSending()) {
+                Procesando envío...
+              } @else {
+                Enviar propuesta de trabajo →
+              }
+            </button>
+            <span class="privacy-note">
+              Tus datos se procesan mediante nuestro puerto desacoplado de notificaciones sin intermediarios publicitarios.
+            </span>
+          </div>
         </form>
+      }
     </div>
+  </div>
 </section>

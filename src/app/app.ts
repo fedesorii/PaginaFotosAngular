@@ -1,29 +1,40 @@
-import { Component, HostListener, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, HostListener, PLATFORM_ID, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { Navbar } from './components/navbar/navbar';
 import { Footer } from './components/footer/footer';
+import { MoodboardService } from './core/services/moodboard.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Navbar, Footer],
+  imports: [RouterOutlet, RouterLink, Navbar, Footer],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
 export class App {
-  protected readonly title = signal('PaginaFotosAngular');
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly router = inject(Router);
+  readonly moodboard = inject(MoodboardService);
 
-  // Variable para controlar si el botón se muestra o no
+  protected readonly title = signal('Ignacio Juárez · Porfolio Fotográfico');
+
   showScrollButton = false;
 
-  // Escucha el evento de scroll en toda la ventana
   @HostListener('window:scroll', [])
-  onWindowScroll() {
-    // Si el usuario bajó más de 400 píxeles, mostramos el botón
-    this.showScrollButton = window.scrollY > 400;
+  onWindowScroll(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.showScrollButton = window.scrollY > 400;
+    }
   }
 
-  // Función para subir con un efecto suave
-  scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  scrollToTop(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  goToQuoteWithMoodboard(): void {
+    this.moodboard.closeDrawer();
+    this.router.navigate(['/contact']);
   }
 }

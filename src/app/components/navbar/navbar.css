@@ -1,145 +1,287 @@
-.navbar {
-  display: flex;
-  justify-content: space-between; /* Distribuye espacio entre izq, centro y der */
-  align-items: center;
-  /* background-color: #f3f1e7; */
-  padding: 20px 40px;
+.navbar-wrapper {
   position: sticky;
   top: 0;
   z-index: 1000;
-  /* height: 80px; */
-  border-bottom: 1px solid rgba(0,0,0,0.05); /* Línea sutil */
+  background-color: var(--bg-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-subtle);
+  transition:
+    background-color 0.4s var(--ease-editorial),
+    border-color 0.4s var(--ease-editorial);
 }
 
-/* --- LOGO (Centro) --- */
-.logo {
-  text-decoration: none;
-  color: #333;
-  font-family: 'Playfair Display', serif; /* Si la tienes cargada */
-  font-size: 1.5rem;
-  letter-spacing: 1px;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 1.15rem 3vw;
+  position: relative;
 }
 
-.logo img {
-  height: 40px; /* Ajusta según tu logo real */
-}
-
-/* --- ENLACES (Izquierda en escritorio) --- */
+/* --- ENLACES IZQUIERDA --- */
 .nav-links {
   display: flex;
-  gap: 30px;
+  align-items: center;
+  gap: 2.1rem;
 }
 
 .nav-links a {
   text-decoration: none;
-  /* font-family: sans-serif; */
-  font-size: 0.95rem;
-  color: #4a4a4a;
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.18em;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  padding-bottom: 3px;
+  border-bottom: 1px solid transparent;
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.nav-index {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  opacity: 0.75;
+}
+
+.nav-links a:hover,
+.nav-links a.active-link {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent-terracotta);
+}
+
+.nav-links a.active-link .nav-index {
+  color: var(--accent-terracotta);
+  opacity: 1;
+}
+
+/* --- LOGO CENTRAL --- */
+.logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.logo-text {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.logo-sub {
+  font-family: var(--font-mono);
+  font-size: 0.54rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* --- ACCIONES DERECHA --- */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.moodboard-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.85rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-editorial);
+}
+
+.moodboard-trigger:hover {
+  border-color: var(--accent-terracotta);
+}
+
+.moodboard-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--text-muted);
+  transition: background-color 0.3s ease;
+}
+
+.moodboard-dot.has-items {
+  background-color: var(--accent-terracotta);
+  box-shadow: 0 0 8px var(--accent-terracotta);
+}
+
+.moodboard-count {
+  font-weight: 600;
+  color: var(--accent-terracotta);
+}
+
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.nav-links a:hover, .active-link, .logo-text:hover {
-  color: #000000;
-  font-weight: 600;
+.theme-toggle-btn:hover {
+  border-color: var(--border-strong);
+  transform: rotate(12deg);
 }
 
-/* --- REDES SOCIALES (Derecha) --- */
+.theme-toggle-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
 .social-media {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 15px;
+  gap: 0.65rem;
+  padding-left: 0.4rem;
+  border-left: 1px solid var(--border-subtle);
 }
 
 .social-media a {
   display: flex;
-  color: #4a4a4a;
-  transition: color 0.3s ease;
+  color: var(--text-secondary);
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease;
 }
 
-.social-media svg{
-  width: 22px;
-  height: 22px;
+.social-media svg {
+  width: 19px;
+  height: 19px;
 }
 
 .social-media a:hover {
-  color: #000000;
-  transform: scale(1.1);
+  color: var(--text-primary);
+  transform: translateY(-2px);
 }
 
-/* --- BOTÓN HAMBURGUESA (Oculto en PC) --- */
+/* --- BOTÓN HAMBURGUESA --- */
 .hamburger-btn {
   display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  width: 36px;
+  height: 36px;
   background: none;
   border: none;
   cursor: pointer;
-  color: #333;
+  padding: 4px;
 }
-.hamburger-btn svg {
-  width: 28px;
-  height: 28px;
+
+.hamburger-line {
+  display: block;
+  width: 24px;
+  height: 1.5px;
+  background-color: var(--text-primary);
+  transition: transform 0.3s ease;
+}
+
+.hamburger-line.active:first-child {
+  transform: translateY(3.75px) rotate(45deg);
+}
+
+.hamburger-line.active:last-child {
+  transform: translateY(-3.75px) rotate(-45deg);
 }
 
 /* ========================================= */
 /* -------------- RESPONSIVE --------------- */
 /* ========================================= */
-@media (max-width: 900px) {
-  .navbar {
-    padding: 15px 20px;
-    justify-content: space-between; /* Botón izq, Logo der/centro */
+@media (max-width: 1080px) {
+  .moodboard-label {
+    display: none;
   }
 
-  /* El logo ya no puede ser absoluto en el centro porque podría tapar el botón */
+  .nav-links {
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 860px) {
+  .navbar {
+    padding: 0.95rem 1.25rem;
+  }
+
+  .hamburger-btn {
+    display: flex;
+  }
+
   .logo {
-    /* position: static; */
-    /* transform: none; */
-    margin-left: auto;
+    position: static;
+    transform: none;
+  }
+
+  .logo-text {
     font-size: 1.4rem;
   }
 
-  .logo-text:hover, .logo-text {
-    color: #4a4a4a;
-    font-weight: 500;
+  .logo-sub {
+    display: none;
   }
 
   .social-media {
     display: none;
   }
 
-  .hamburger-btn {
-  display: block; /* Aparece el botón */
-  }
-
-  /* MENÚ DESPLEGABLE */
   .nav-links {
     position: absolute;
-    top: 60px; /* Justo debajo del navbar */
+    top: 100%;
     left: 0;
     width: 100%;
-    /* background-color: #f3f1e7; */
-    flex-direction: column; /* Lista vertical */
-    align-items: center;
+    background-color: var(--bg-primary);
+    flex-direction: column;
+    align-items: stretch;
     gap: 0;
     overflow: hidden;
-    max-height: 0; /* Cerrado por defecto */
-    transition: max-height 0.4s ease-in-out; /* Animación suave */
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    max-height: 0;
+    transition: max-height 0.4s var(--ease-editorial);
+    border-bottom: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-soft);
   }
 
-  /* CLASE QUE ABRE EL MENÚ (Controlada por Angular) */
   .nav-links.open {
-    max-height: 200px; /* Altura suficiente para los links */
+    max-height: 320px;
   }
 
   .nav-links a {
-    padding: 15px;
+    padding: 1rem 1.5rem;
     width: 100%;
-    text-align: center;
-    border-bottom: 1px solid rgba(0,0,0,0.03);
+    justify-content: flex-start;
+    border-bottom: 1px solid var(--border-subtle);
   }
 }

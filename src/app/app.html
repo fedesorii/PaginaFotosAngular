@@ -1,16 +1,98 @@
 <app-navbar />
-<div class="main-content">
-    <router-outlet />
-</div>
+
+<main class="main-content">
+  <router-outlet />
+</main>
+
 <app-footer />
 
+<!-- Drawer Flotante: Mesa de Luz (Selección de Fotografías para Cliente) -->
+@if (moodboard.isDrawerOpen()) {
+  <div class="moodboard-backdrop" (click)="moodboard.closeDrawer()">
+    <aside class="moodboard-drawer" (click)="$event.stopPropagation()" aria-label="Mesa de Luz">
+      <div class="moodboard-header">
+        <div>
+          <span class="eyebrow-tag">Referencia Visual</span>
+          <h3 class="moodboard-title">Mesa de Luz ({{ moodboard.count() }})</h3>
+        </div>
+        <button
+          type="button"
+          class="drawer-close-btn"
+          (click)="moodboard.closeDrawer()"
+          aria-label="Cerrar Mesa de Luz"
+        >
+          Cerrar ✕
+        </button>
+      </div>
+
+      <p class="moodboard-intro">
+        Seleccioná las fotografías cuyo estilo de luz, encuadre o atmósfera te gustaría para tu
+        evento o sesión. Se adjuntarán automáticamente a tu consulta.
+      </p>
+
+      @if (moodboard.items().length > 0) {
+        <div class="moodboard-grid">
+          @for (item of moodboard.items(); track item.photoId) {
+            <div class="moodboard-card">
+              <a
+                [routerLink]="['/gallery', item.folderId]"
+                (click)="moodboard.closeDrawer()"
+                class="moodboard-thumb-link"
+              >
+                <img [src]="item.thumbUrl" [alt]="item.photoTitle" loading="lazy" />
+              </a>
+              <div class="moodboard-card-meta">
+                <span class="moodboard-card-title">{{ item.photoTitle }}</span>
+                <span class="moodboard-card-folder">{{ item.folderTitle }}</span>
+              </div>
+              <button
+                type="button"
+                class="moodboard-remove-btn"
+                (click)="moodboard.removePhoto(item.photoId)"
+                aria-label="Quitar fotografía de la selección"
+                title="Quitar de la selección"
+              >
+                ✕
+              </button>
+            </div>
+          }
+        </div>
+
+        <div class="moodboard-footer">
+          <button type="button" class="btn-editorial" (click)="moodboard.clearAll()">
+            Vaciar Selección
+          </button>
+          <button
+            type="button"
+            class="btn-editorial btn-editorial--solid"
+            (click)="goToQuoteWithMoodboard()"
+          >
+            Cotizar con esta Selección →
+          </button>
+        </div>
+      } @else {
+        <div class="moodboard-empty">
+          <p class="empty-headline">Tu Mesa de Luz está vacía</p>
+          <p class="empty-sub">
+            Al recorrer cualquier carpeta o ampliar una fotografía, pulsá en
+            <strong>"+ Mesa de Luz"</strong> para guardar tus referencias favoritas.
+          </p>
+        </div>
+      }
+    </aside>
+  </div>
+}
+
 <button
-    class="back-to-top"
-    [class.visible]="showScrollButton"
-    (click)="scrollToTop()"
-    aria-label="Volver arriba">
-    <!-- <?xml version="1.0" encoding="UTF-8"?> -->
-    <svg xmlns="http://www.w3.org/2000/svg" id="arrow-circle-down" viewBox="0 0 24 24" width="100%" height="100%">
-        <path d="M12,0A12,12,0,1,1,0,12,12.013,12.013,0,0,1,12,0Zm0,22A10,10,0,1,0,2,12,10.011,10.011,0,0,0,12,22ZM10.586,8.586,5.874,13.3l1.414,1.414L12,10l4.673,4.673,1.414-1.414L13.414,8.586a2,2,0,0,0-2.828,0Z"/>
-    </svg>
+  type="button"
+  class="back-to-top"
+  [class.visible]="showScrollButton"
+  (click)="scrollToTop()"
+  aria-label="Volver arriba"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%">
+    <path
+      d="M12,0A12,12,0,1,1,0,12,12.013,12.013,0,0,1,12,0Zm0,22A10,10,0,1,0,2,12,10.011,10.011,0,0,0,12,22ZM10.586,8.586,5.874,13.3l1.414,1.414L12,10l4.673,4.673,1.414-1.414L13.414,8.586a2,2,0,0,0-2.828,0Z"
+    />
+  </svg>
 </button>

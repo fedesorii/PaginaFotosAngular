@@ -1,31 +1,133 @@
-<section class="about-container">
-  
-  <div class="about-image-wrapper">
-    <img src="assets/FotoPerfil-NachoJuarez.jpeg" alt="Retrato del fotógrafo" class="portrait-img" />
-  </div>
+<article class="cv-page">
+  <!-- 1. RETRATO ANALÓGICO & MANIFIESTO -->
+  <section class="about-container">
+    <div class="about-image-col" appReveal>
+      <div class="film-frame watermarked-stage">
+        <div class="film-strip-header">
+          <span>KODAK 400 TX · 35MM</span>
+          <span>AUTORRETRATO // QUILMES, BA</span>
+        </div>
 
-  <div class="about-content">
-    
-    <blockquote class="manifesto-quote">
-       Fotografía con identidad <br>
-       y luz propia
-    </blockquote>
+        <div class="about-image-wrapper">
+          <img
+            [src]="profile().portraitImageUrl"
+            alt="Retrato de Ignacio Juárez con cámara Kodak"
+            class="portrait-img"
+          />
+        </div>
 
-    <div class="editorial-text">
-      <p>
-        Soy fotógrafo autónomo de la zona sur de Buenos Aires. Mi mirada comenzó a formarse recorriendo distintas provincias del país, siempre en búsqueda de escenas reales y momentos auténticos.
-      </p>
-      <p>Trabajo con una fuerte influencia de la fotografía analógica, priorizando la esencia, la naturalidad y el detalle.</p>
-      <p>
-        Me especializo en eventos, fotografía de producto y paisajes, ofreciendo imágenes con colorimetría precisa, luz cuidada y una estética honesta que transmite emociones reales.
-      </p>
+        <div class="film-strip-footer">
+          <span>IGNACIO NAHUEL JUÁREZ</span>
+          <span>PASÁ EL CURSOR PARA REVELAR COLOR →</span>
+        </div>
+      </div>
     </div>
 
-    <div class="cta-section">
-      <p class="cta-text">¿Tenés una historia que merece ser contada?</p>
-      <a routerLink="/contact" class="btn-minimalist">Hablemos</a>
+    <div class="about-content" appReveal [revealIndex]="1">
+      <span class="eyebrow-tag">Currículum Visual &amp; Manifiesto</span>
+      <h1 class="cv-name">{{ profile().fullName }}</h1>
+      <p class="cv-role">{{ profile().roleTitle }}</p>
+
+      <blockquote class="manifesto-quote">
+        "{{ profile().manifestoQuote }}"
+      </blockquote>
+
+      <div class="editorial-text">
+        @for (paragraph of profile().biographyParagraphs; track $index) {
+          <p>{{ paragraph }}</p>
+        }
+      </div>
+
+      <!-- Métricas de Respaldo -->
+      <div class="cv-stats-grid">
+        @for (stat of profile().stats; track stat.label) {
+          <div class="cv-stat-box">
+            <span class="stat-value">{{ stat.value }}</span>
+            <span class="stat-label">{{ stat.label }}</span>
+            <span class="stat-detail">{{ stat.detail }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="cta-section">
+        <p class="cta-text">¿Tenés un evento, marca o historia que merece ser contada?</p>
+        <div class="cta-buttons">
+          <a routerLink="/contact" class="btn-editorial btn-editorial--solid">
+            Solicitar Presupuesto
+          </a>
+          <a routerLink="/" class="btn-editorial">Explorar Carpetas</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. CRONOLOGÍA DE EVENTOS, SESIONES Y PROYECTOS (CV TIMELINE) -->
+  <section class="cv-timeline-section">
+    <div class="section-head">
+      <span class="eyebrow-tag">Trayectoria &amp; Producciones</span>
+      <h2 class="section-title">Participación en Eventos, Campañas &amp; Ensayos</h2>
     </div>
 
-  </div>
+    <div class="timeline-list">
+      @for (entry of profile().timeline; track entry.projectOrClient) {
+        <article class="timeline-item" appReveal>
+          <div class="timeline-meta">
+            <span class="timeline-year">{{ entry.year }}</span>
+            <span class="timeline-cat">{{ entry.category }}</span>
+            <span class="timeline-loc">{{ entry.location }}</span>
+          </div>
 
-</section>
+          <div class="timeline-body">
+            <h3 class="timeline-role">{{ entry.role }}</h3>
+            <h4 class="timeline-project">{{ entry.projectOrClient }}</h4>
+            <p class="timeline-desc">{{ entry.description }}</p>
+
+            @if (entry.relatedFolderId) {
+              <a [routerLink]="['/gallery', entry.relatedFolderId]" class="timeline-link">
+                Inspeccionar carpeta del proyecto →
+              </a>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  </section>
+
+  <!-- 3. METODOLOGÍA DE TRABAJO & EQUIPAMIENTO -->
+  <section class="methodology-section">
+    <div class="methodology-col">
+      <span class="eyebrow-tag">Proceso de Producción</span>
+      <h2 class="section-title">Cómo trabajamos cada sesión</h2>
+
+      <div class="workflow-steps">
+        @for (step of profile().workflowSteps; track step.stepNumber) {
+          <div class="workflow-card" appReveal>
+            <span class="step-num">{{ step.stepNumber }}</span>
+            <div>
+              <h3 class="step-title">{{ step.title }}</h3>
+              <p class="step-desc">{{ step.description }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="equipment-col">
+      <span class="eyebrow-tag">Especificaciones Técnicas</span>
+      <h2 class="section-title">Óptica, Formato &amp; Laboratorio</h2>
+
+      <div class="equipment-groups">
+        @for (group of profile().equipment; track group.category) {
+          <div class="equip-card" appReveal>
+            <h3 class="equip-category">{{ group.category }}</h3>
+            <ul class="equip-list">
+              @for (item of group.items; track item) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+</article>

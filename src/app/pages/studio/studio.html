@@ -1,0 +1,606 @@
+<section class="studio-page">
+  <header class="studio-header">
+    <div>
+      <span class="studio-eyebrow">Panel de Administración & Arquitectura Hexagonal</span>
+      <h1 class="studio-title">Studio Control & Puertos Desacoplados</h1>
+      <p class="studio-subtitle">
+        Gestioná la carga de fotografías, nuevas carpetas de eventos y el intercambio en caliente de adaptadores
+        (Cloudinary, almacenamiento local/S3, EmailJS, Webhooks y protección de marca de agua) sin tocar el núcleo de la aplicación.
+      </p>
+    </div>
+
+    <div class="host-status-pill">
+      <span class="pill-label">Host Detectado</span>
+      <strong>{{ portfolio.hostPlatform() | uppercase }}</strong>
+      <span class="pill-sub">{{ portfolio.folders().length }} carpetas · {{ portfolio.totalPhotosCount() }} obras</span>
+    </div>
+  </header>
+
+  <!-- NAVEGACIÓN DE TABS -->
+  <nav class="studio-tabs" aria-label="Secciones de administración">
+    <button
+      type="button"
+      class="studio-tab"
+      [class.active]="activeTab() === 'upload'"
+      (click)="setTab('upload')"
+    >
+      01 · Cargar Fotografía
+    </button>
+    <button
+      type="button"
+      class="studio-tab"
+      [class.active]="activeTab() === 'folders'"
+      (click)="setTab('folders')"
+    >
+      02 · Nueva Carpeta / Evento
+    </button>
+    <button
+      type="button"
+      class="studio-tab"
+      [class.active]="activeTab() === 'adapters'"
+      (click)="setTab('adapters')"
+    >
+      03 · Puertos & Adaptadores
+    </button>
+    <button
+      type="button"
+      class="studio-tab"
+      [class.active]="activeTab() === 'inquiries'"
+      (click)="setTab('inquiries')"
+    >
+      04 · Consultas Recibidas ({{ inquiries().length }})
+    </button>
+  </nav>
+
+  @if (statusBanner(); as banner) {
+    <div class="studio-banner" [class.error]="banner.type === 'error'" role="status">
+      <span>{{ banner.text }}</span>
+      <button type="button" (click)="statusBanner.set(null)">✕</button>
+    </div>
+  }
+
+  <!-- TAB 1: CARGAR FOTOGRAFÍA -->
+  @if (activeTab() === 'upload') {
+    <div class="studio-panel-grid">
+      <form class="studio-form" (submit)="submitPhotoUpload($event)">
+        <h2 class="panel-heading">Agregar fotografía a una carpeta</h2>
+        <p class="panel-desc">
+          Si configurás un <em>Upload Preset</em> de Cloudinary en la pestaña de Adaptadores, el archivo se enviará directo a la nube.
+          De lo contrario, el adaptador híbrido la persiste en el catálogo del estudio listo para exportar.
+        </p>
+
+        <div class="field-row-two">
+          <div class="field-group">
+            <label for="uploadFolderId">Carpeta de destino *</label>
+            <select id="uploadFolderId" name="uploadFolderId" [(ngModel)]="uploadFolderId">
+              @for (folder of portfolio.folders(); track folder.id) {
+                <option [value]="folder.id">{{ folder.title }} ({{ folder.photoCount }} fotos)</option>
+              }
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label for="uploadAspectVariant">Formato en Grilla Collage</label>
+            <select id="uploadAspectVariant" name="uploadAspectVariant" [(ngModel)]="uploadAspectVariant">
+              <option value="tall">Vertical Alto (3.6 : 5.6)</option>
+              <option value="portrait">Retrato Clásico (4 : 5.4)</option>
+              <option value="editorial">Editorial Medio (4 : 4.8)</option>
+              <option value="compact">Compacto (4 : 4.4)</option>
+              <option value="landscape">Horizontal / Apaisado (6 : 5)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="photoFile">Seleccionar archivo local (JPG, PNG, WebP, AVIF)</label>
+          <input
+            type="file"
+            id="photoFile"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+          />
+        </div>
+
+        <div class="field-group">
+          <label for="uploadImageUrl">O pegar URL directa (Cloudinary / S3 / CDN) *</label>
+          <input
+            type="url"
+            id="uploadImageUrl"
+            name="uploadImageUrl"
+            [(ngModel)]="uploadImageUrl"
+            placeholder="https://res.cloudinary.com/ddozsonun/image/upload/..."
+            required
+          />
+        </div>
+
+        <div class="field-row-two">
+          <div class="field-group">
+            <label for="uploadTitle">Título de la obra *</label>
+            <input
+              type="text"
+              id="uploadTitle"
+              name="uploadTitle"
+              [(ngModel)]="uploadTitle"
+              placeholder="Ej. Contraluz en el Salón Principal"
+              required
+            />
+          </div>
+
+          <div class="field-group">
+            <label for="uploadLocation">Locación y Año</label>
+            <input
+              type="text"
+              id="uploadLocation"
+              name="uploadLocation"
+              [(ngModel)]="uploadLocation"
+              placeholder="Quilmes, Buenos Aires"
+            />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="uploadCaption">Pie de foto / Nota técnica</label>
+          <textarea
+            id="uploadCaption"
+            name="uploadCaption"
+            [(ngModel)]="uploadCaption"
+            rows="3"
+            placeholder="Descripción breve de la escena, iluminación o momento capturado..."
+          ></textarea>
+        </div>
+
+        <button type="submit" class="btn-studio-primary" [disabled]="isUploadingPhoto()">
+          @if (isUploadingPhoto()) {
+            Subiendo fotografía...
+          } @else {
+            Publicar fotografía en carpeta →
+          }
+        </button>
+      </form>
+
+      <aside class="studio-preview-card">
+        <span class="preview-label">Previsualización con Marca de Agua</span>
+        @if (uploadImageUrl) {
+          <div class="preview-frame">
+            <img [src]="uploadImageUrl" [alt]="uploadTitle || 'Vista previa'" />
+            @if (portfolio.runtimeConfig().watermarkEnabled) {
+              <div class="preview-watermark">
+                {{ portfolio.runtimeConfig().watermarkText }}
+              </div>
+            }
+          </div>
+          <div class="preview-meta">
+            <strong>{{ uploadTitle || 'Sin título' }}</strong>
+            <span>Carpeta: {{ uploadFolderId }} · Formato: {{ uploadAspectVariant }}</span>
+          </div>
+        } @else {
+          <div class="preview-empty">
+            <p>Seleccioná una imagen o pegá una URL para previsualizar el encuadre y el sello de agua discreto.</p>
+          </div>
+        }
+      </aside>
+    </div>
+  }
+
+  <!-- TAB 2: NUEVA CARPETA / SERIE -->
+  @if (activeTab() === 'folders') {
+    <div class="studio-panel-grid">
+      <form class="studio-form" (submit)="submitCreateFolder($event)">
+        <h2 class="panel-heading">Crear nueva carpeta de evento o sesión</h2>
+        <p class="panel-desc">
+          Cada carpeta genera su portada con título en hover en el inicio y su vista de resumen superior estilo Levon Biss.
+        </p>
+
+        <div class="field-row-two">
+          <div class="field-group">
+            <label for="folderTitle">Título de la carpeta *</label>
+            <input
+              type="text"
+              id="folderTitle"
+              name="folderTitle"
+              [(ngModel)]="folderTitle"
+              placeholder="Ej. Festival de Jazz en Usina"
+              required
+            />
+          </div>
+
+          <div class="field-group">
+            <label for="folderSubtitle">Subtítulo / Especialidad</label>
+            <input
+              type="text"
+              id="folderSubtitle"
+              name="folderSubtitle"
+              [(ngModel)]="folderSubtitle"
+              placeholder="Ej. Crónica de Escenario & Backstage"
+            />
+          </div>
+        </div>
+
+        <div class="field-row-three">
+          <div class="field-group">
+            <label for="folderCategory">Categoría</label>
+            <select id="folderCategory" name="folderCategory" [(ngModel)]="folderCategory">
+              <option value="eventos">Eventos &amp; Aniversarios</option>
+              <option value="gastronomia">Gastronomía &amp; Producto</option>
+              <option value="paisajes">Paisaje &amp; Territorio</option>
+              <option value="retratos">Retratos &amp; Escena</option>
+              <option value="documental">Crónica Cultural</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label for="folderLocation">Locación</label>
+            <input
+              type="text"
+              id="folderLocation"
+              name="folderLocation"
+              [(ngModel)]="folderLocation"
+              placeholder="CABA, Argentina"
+            />
+          </div>
+
+          <div class="field-group">
+            <label for="folderYear">Año</label>
+            <input
+              type="text"
+              id="folderYear"
+              name="folderYear"
+              [(ngModel)]="folderYear"
+              placeholder="2026"
+            />
+          </div>
+        </div>
+
+        <div class="field-row-two">
+          <div class="field-group">
+            <label for="folderClient">Cliente o Contexto</label>
+            <input
+              type="text"
+              id="folderClient"
+              name="folderClient"
+              [(ngModel)]="folderClient"
+              placeholder="Ej. Producción por encargo / Serie de autor"
+            />
+          </div>
+
+          <div class="field-group">
+            <label for="folderCloudinaryTag">Tag en Cloudinary (opcional)</label>
+            <input
+              type="text"
+              id="folderCloudinaryTag"
+              name="folderCloudinaryTag"
+              [(ngModel)]="folderCloudinaryTag"
+              placeholder="Ej. festival-jazz-2026"
+            />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="folderCoverFile">Imagen de Portada (Archivo o URL) *</label>
+          <input type="file" id="folderCoverFile" accept="image/*" (change)="onCoverFileSelected($event)" />
+          <input
+            type="url"
+            name="folderCoverUrl"
+            [(ngModel)]="folderCoverUrl"
+            placeholder="https://res.cloudinary.com/ddozsonun/image/upload/..."
+            required
+          />
+        </div>
+
+        <div class="field-group">
+          <label for="folderSummary">Descripción breve (visible en cabecera de carpeta) *</label>
+          <textarea
+            id="folderSummary"
+            name="folderSummary"
+            [(ngModel)]="folderSummary"
+            rows="3"
+            placeholder="Resumen conciso sobre el evento o sesión que orienta al cliente..."
+            required
+          ></textarea>
+        </div>
+
+        <div class="field-group">
+          <label for="folderExtendedNotesText">Notas extendidas ("Leer más...", un párrafo por línea)</label>
+          <textarea
+            id="folderExtendedNotesText"
+            name="folderExtendedNotesText"
+            [(ngModel)]="folderExtendedNotesText"
+            rows="4"
+            placeholder="Detalles de iluminación, narrativa visual y equipamiento utilizado..."
+          ></textarea>
+        </div>
+
+        <button type="submit" class="btn-studio-primary" [disabled]="isSavingFolder()">
+          Crear carpeta y publicar →
+        </button>
+      </form>
+
+      <aside class="studio-folders-list">
+        <span class="preview-label">Carpetas Activas ({{ portfolio.folders().length }})</span>
+        <div class="folder-mini-items">
+          @for (folder of portfolio.folders(); track folder.id) {
+            <div class="folder-mini-row">
+              <img [src]="folder.coverPhotoUrl" [alt]="folder.title" />
+              <div class="folder-mini-info">
+                <strong>{{ folder.title }}</strong>
+                <span>{{ folder.category | uppercase }} · {{ folder.photoCount }} fotos</span>
+              </div>
+              <a [routerLink]="['/gallery', folder.id]" class="folder-mini-link">Ver ↗</a>
+              @if (isCustomFolder(folder.id)) {
+                <button
+                  type="button"
+                  class="btn-studio-secondary"
+                  style="padding: 0.3rem 0.55rem; font-size: 0.65rem;"
+                  (click)="removeCustomFolder(folder.id)"
+                  title="Eliminar carpeta personalizada"
+                >
+                  ✕
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </aside>
+    </div>
+  }
+
+  <!-- TAB 3: PUERTOS & ADAPTADORES HEXAGONALES -->
+  @if (activeTab() === 'adapters') {
+    <div class="studio-panel-grid">
+      <form class="studio-form" (submit)="saveAdaptersConfig($event)">
+        <h2 class="panel-heading">Configuración de Puertos & Adaptadores</h2>
+        <p class="panel-desc">
+          El núcleo de Angular se comunica exclusivamente con interfaces (<code>PhotoCatalogPort</code>,
+          <code>PhotoUploadPort</code>, <code>EmailNotificationPort</code>, <code>HostEnvironmentPort</code>).
+          Aquí podés intercambiar proveedores sin recompilar el código fuente.
+        </p>
+
+        <!-- Adaptador de Catálogo e Imágenes -->
+        <div class="adapter-section">
+          <h3>1. Puerto de Catálogo & Almacenamiento de Fotos</h3>
+          <div class="pill-selector">
+            <button
+              type="button"
+              class="adapter-pill"
+              [class.active]="configDraft.mediaAdapter === 'cloudinary-hybrid'"
+              (click)="setMediaAdapter('cloudinary-hybrid')"
+            >
+              Cloudinary + Catálogo Híbrido
+            </button>
+            <button
+              type="button"
+              class="adapter-pill"
+              [class.active]="configDraft.mediaAdapter === 'curated-local'"
+              (click)="setMediaAdapter('curated-local')"
+            >
+              Catálogo Estático / CDN Propio
+            </button>
+          </div>
+
+          <div class="field-row-three">
+            <div class="field-group">
+              <label for="primaryCloud">Cloud Name Primario</label>
+              <input
+                type="text"
+                id="primaryCloud"
+                name="primaryCloud"
+                [(ngModel)]="configDraft.cloudinaryPrimaryCloudName"
+              />
+            </div>
+
+            <div class="field-group">
+              <label for="fallbackCloud">Cloud Name Secundario</label>
+              <input
+                type="text"
+                id="fallbackCloud"
+                name="fallbackCloud"
+                [(ngModel)]="configDraft.cloudinaryFallbackCloudName"
+              />
+            </div>
+
+            <div class="field-group">
+              <label for="uploadPreset">Unsigned Upload Preset</label>
+              <input
+                type="text"
+                id="uploadPreset"
+                name="uploadPreset"
+                [(ngModel)]="configDraft.cloudinaryUploadPreset"
+                placeholder="Opcional para subida directa"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Adaptador de Emails -->
+        <div class="adapter-section">
+          <h3>2. Puerto de Notificaciones y Presupuestos</h3>
+          <div class="pill-selector">
+            <button
+              type="button"
+              class="adapter-pill"
+              [class.active]="configDraft.emailAdapter === 'resilient-queue'"
+              (click)="setEmailAdapter('resilient-queue')"
+            >
+              Cola Resiliente + Mailto Directo
+            </button>
+            <button
+              type="button"
+              class="adapter-pill"
+              [class.active]="configDraft.emailAdapter === 'emailjs'"
+              (click)="setEmailAdapter('emailjs')"
+            >
+              EmailJS API
+            </button>
+            <button
+              type="button"
+              class="adapter-pill"
+              [class.active]="configDraft.emailAdapter === 'webhook'"
+              (click)="setEmailAdapter('webhook')"
+            >
+              Webhook HTTP (Resend / Formspree / API)
+            </button>
+          </div>
+
+          @if (configDraft.emailAdapter === 'emailjs') {
+            <div class="field-row-three">
+              <div class="field-group">
+                <label for="ejsService">EmailJS Service ID</label>
+                <input
+                  type="text"
+                  id="ejsService"
+                  name="ejsService"
+                  [(ngModel)]="configDraft.emailJsServiceId"
+                  placeholder="service_xxxxxx"
+                />
+              </div>
+              <div class="field-group">
+                <label for="ejsTemplate">EmailJS Template ID</label>
+                <input
+                  type="text"
+                  id="ejsTemplate"
+                  name="ejsTemplate"
+                  [(ngModel)]="configDraft.emailJsTemplateId"
+                  placeholder="template_xxxxxx"
+                />
+              </div>
+              <div class="field-group">
+                <label for="ejsKey">EmailJS Public Key</label>
+                <input
+                  type="text"
+                  id="ejsKey"
+                  name="ejsKey"
+                  [(ngModel)]="configDraft.emailJsPublicKey"
+                />
+              </div>
+            </div>
+          }
+
+          @if (configDraft.emailAdapter === 'webhook') {
+            <div class="field-group">
+              <label for="webhookUrl">Endpoint URL del Webhook (POST JSON)</label>
+              <input
+                type="url"
+                id="webhookUrl"
+                name="webhookUrl"
+                [(ngModel)]="configDraft.webhookEndpointUrl"
+                placeholder="https://api.tudominio.com/v1/inquiries"
+              />
+            </div>
+          }
+        </div>
+
+        <!-- Marca de Agua -->
+        <div class="adapter-section">
+          <h3>3. Protección de Autoría (Marca de Agua en Focus/Lightbox)</h3>
+          <div class="field-row-two">
+            <div class="field-group">
+              <label for="watermarkText">Firma en Marca de Agua</label>
+              <input
+                type="text"
+                id="watermarkText"
+                name="watermarkText"
+                [(ngModel)]="configDraft.watermarkText"
+              />
+            </div>
+
+            <div class="field-group checkbox-group">
+              <label>
+                <input
+                  type="checkbox"
+                  name="watermarkEnabled"
+                  [(ngModel)]="configDraft.watermarkEnabled"
+                />
+                Activar marca de agua discreta al maximizar fotografías
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="adapter-actions">
+          <button type="submit" class="btn-studio-primary">Guardar configuración de adaptadores</button>
+          <button type="button" class="btn-studio-secondary" (click)="resetAdaptersToDefault()">
+            Restaurar valores por defecto
+          </button>
+        </div>
+      </form>
+
+      <aside class="studio-manifest-card">
+        <span class="preview-label">Portabilidad de Catálogo (JSON Manifest)</span>
+        <p class="panel-desc">
+          Exportá o importá todas las carpetas, fotos cargadas y configuración de adaptadores en un único JSON portable entre cualquier host (Vercel, Netlify, Cloudflare, S3).
+        </p>
+        <textarea
+          class="manifest-textarea"
+          [(ngModel)]="manifestJsonText"
+          rows="12"
+          placeholder="Hacé clic en 'Generar JSON' para inspeccionar el estado actual..."
+        ></textarea>
+        <div class="manifest-buttons">
+          <button type="button" class="btn-studio-secondary" (click)="generateManifestExport()">
+            Generar JSON actual
+          </button>
+          <button type="button" class="btn-studio-primary" (click)="importManifestFromText()">
+            Importar JSON
+          </button>
+        </div>
+      </aside>
+    </div>
+  }
+
+  <!-- TAB 4: BANDEJA DE CONSULTAS -->
+  @if (activeTab() === 'inquiries') {
+    <div class="inquiries-panel">
+      <div class="inquiries-header">
+        <div>
+          <h2 class="panel-heading">Historial de Propuestas & Presupuestos</h2>
+          <p class="panel-desc">
+            Respaldo local de todas las consultas enviadas por clientes junto con las fotografías adjuntas desde su Mesa de Luz.
+          </p>
+        </div>
+        @if (inquiries().length > 0) {
+          <button type="button" class="btn-studio-secondary" (click)="clearInquiries()">
+            Limpiar registro
+          </button>
+        }
+      </div>
+
+      @if (inquiries().length === 0) {
+        <div class="inquiries-empty">
+          <p>Todavía no hay consultas registradas en este navegador. Podés probar el flujo desde la página de <a routerLink="/contact">Contacto</a>.</p>
+        </div>
+      } @else {
+        <div class="inquiry-cards">
+          @for (item of inquiries(); track item.id) {
+            <article class="inquiry-card">
+              <div class="inquiry-top">
+                <span class="inquiry-ref">{{ item.id }} · {{ item.serviceType }}</span>
+                <time>{{ item.createdAt | date:'medium' }}</time>
+              </div>
+              <h3>{{ item.subject }}</h3>
+              <p class="inquiry-client">
+                <strong>{{ item.clientName }}</strong> ({{ item.clientEmail }})
+                @if (item.clientPhone) { · Tel: {{ item.clientPhone }} }
+                @if (item.eventDate) { · Fecha: {{ item.eventDate }} }
+                @if (item.eventLocation) { · Lugar: {{ item.eventLocation }} }
+              </p>
+              <p class="inquiry-body">{{ item.message }}</p>
+
+              @if (item.moodboardItems.length > 0) {
+                <div class="inquiry-moodboard">
+                  <span>Referencias de Mesa de Luz adjuntas ({{ item.moodboardItems.length }}):</span>
+                  <div class="inquiry-thumbs">
+                    @for (ref of item.moodboardItems; track ref.photoId) {
+                      <a [routerLink]="['/gallery', ref.folderId]" class="inquiry-thumb" [title]="ref.photoTitle">
+                        <img [src]="ref.thumbUrl" [alt]="ref.photoTitle" />
+                      </a>
+                    }
+                  </div>
+                </div>
+              }
+            </article>
+          }
+        </div>
+      }
+    </div>
+  }
+</section>

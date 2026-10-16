@@ -1,4 +1,221 @@
-/* You can add global styles to this file, and also import other style files */
-/* * {
-    background-color: #f3f2ee;
-} */
+/* ==========================================================================
+   IGNACIO JUÁREZ — AWWWARDS EDITORIAL DESIGN SYSTEM
+   Inspirado en: lieben.no (elegancia analógica cálida),
+   alextranphotography.com (grilla collage con desnivel),
+   levonbiss.com/microsculpture (ficha curatorial y cámara oscura).
+   ========================================================================== */
+
+:root {
+  /* Paleta Luz de Estudio (Papel Algodón & Carbón Analógico - Estilo Lieben.no) */
+  --bg-primary: #f6f4ef;
+  --bg-surface: #ffffff;
+  --bg-elevated: #efece6;
+  --bg-card: #eae6de;
+  --bg-glass: rgba(246, 244, 239, 0.88);
+  --text-primary: #151413;
+  --text-secondary: #4e4b46;
+  --text-muted: #7d7870;
+  --accent-terracotta: #8f5338;
+  --accent-amber: #b87b4b;
+  --border-subtle: rgba(21, 20, 19, 0.09);
+  --border-strong: rgba(21, 20, 19, 0.22);
+  --shadow-soft: 0 18px 48px rgba(20, 18, 15, 0.07);
+  --shadow-hover: 0 26px 64px rgba(20, 18, 15, 0.14);
+
+  /* Tipografías */
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Transiciones */
+  --ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Tema Cuarto Oscuro (Darkroom Mode - Estilo Levon Biss Microsculpture) */
+html.darkroom-theme {
+  --bg-primary: #0d0d0c;
+  --bg-surface: #121210;
+  --bg-elevated: #161614;
+  --bg-card: #1d1c1a;
+  --bg-glass: rgba(13, 13, 12, 0.88);
+  --text-primary: #f3f0ea;
+  --text-secondary: #b8b3a8;
+  --text-muted: #7f7a70;
+  --accent-terracotta: #c87d55;
+  --accent-amber: #d49b6a;
+  --border-subtle: rgba(243, 240, 234, 0.09);
+  --border-strong: rgba(243, 240, 234, 0.24);
+  --shadow-soft: 0 18px 48px rgba(0, 0, 0, 0.45);
+  --shadow-hover: 0 26px 64px rgba(0, 0, 0, 0.68);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition:
+    background-color 0.45s var(--ease-editorial),
+    color 0.45s var(--ease-editorial);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* Textura sutil de grano analógico en toda la experiencia */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9990;
+  opacity: 0.028;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.75) 0.55px, transparent 0.55px);
+  background-size: 3px 3px;
+}
+
+::selection {
+  background-color: var(--accent-terracotta);
+  color: #ffffff;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ==========================================================================
+   SISTEMA DE MARCA DE AGUA DISCRETA (PROTECCIÓN DE AUTORÍA)
+   ========================================================================== */
+
+.watermarked-stage {
+  position: relative;
+  overflow: hidden;
+}
+
+.discrete-watermark {
+  position: absolute;
+  bottom: 14px;
+  right: 16px;
+  z-index: 4;
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.52);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+  padding: 4px 9px;
+  border-radius: 2px;
+  background: rgba(12, 12, 12, 0.22);
+  backdrop-filter: blur(2px);
+  transition: opacity 0.35s ease;
+}
+
+.discrete-watermark--center-seal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-18deg);
+  z-index: 4;
+  pointer-events: none;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1rem, 2.2vw, 1.75rem);
+  letter-spacing: 0.32em;
+  color: rgba(255, 255, 255, 0.13);
+  white-space: nowrap;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+/* ==========================================================================
+   ELEMENTOS EDITORIALES COMUNES
+   ========================================================================== */
+
+.eyebrow-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-terracotta);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.eyebrow-tag::before {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 1px;
+  background-color: currentColor;
+}
+
+.btn-editorial {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.85rem 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.35s var(--ease-editorial);
+}
+
+.btn-editorial:hover:not([disabled]) {
+  background-color: var(--text-primary);
+  color: var(--bg-primary);
+  transform: translateY(-2px);
+}
+
+.btn-editorial--solid {
+  background-color: var(--text-primary);
+  color: var(--bg-primary);
+}
+
+.btn-editorial--solid:hover:not([disabled]) {
+  background-color: var(--accent-terracotta);
+  border-color: var(--accent-terracotta);
+  color: #ffffff;
+}
+
+/* Scrollbar sutil */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}

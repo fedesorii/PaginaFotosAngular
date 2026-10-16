@@ -1,48 +1,111 @@
-import { Component } from '@angular/core';
-import { sendForm, type EmailJSResponseStatus } from '@emailjs/browser';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { EMAIL_NOTIFICATION_PORT } from '../../core/ports/email-notification.port';
+import { MoodboardService } from '../../core/services/moodboard.service';
+import { PortfolioStateService } from '../../core/services/portfolio-state.service';
+import { ContactInquiry, EmailDeliveryResult } from '../../core/domain/models/inquiry.model';
 
 @Component({
   selector: 'app-contact',
-  imports: [],
   standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './contact.html',
   styleUrl: './contact.css',
 })
-export class Contact {
-  isSending = false;
-  isSent = false;
-  errorMessage = '';
+export class Contact implements OnInit {
+  private readonly emailPort = inject(EMAIL_NOTIFICATION_PORT);
+  private readonly route = inject(ActivatedRoute);
+  readonly moodboard = inject(MoodboardService);
+  readonly portfolio = inject(PortfolioStateService);
 
-  onSubmit(event: Event) {
-    event.preventDefault(); // Evita que la página parpadee al enviar
-    this.isSending = true;
-    this.errorMessage = '';
+  readonly serviceOptions = [
+    'Cobertura de Eventos & Aniversarios',
+    'Fotografía Gastronómica & Producto',
+    'Sesión Editorial & Retrato',
+    'Crónica de Viaje / Paisaje / Arquitectura',
+    'Proyecto Integral a Medida',
+  ];
 
-    const form = event.target as HTMLFormElement;
+  clientName = '';
+  clientEmail = '';
+  clientPhone = '';
+  serviceType = this.serviceOptions[0];
+  eventDate = '';
+  eventLocation = '';
+  subject = '';
+  message = '';
 
-    // Se envía el formulario utilizando EmailJS
-    sendForm(
-      'TU_SERVICE_ID',     // 1. Reemplaza con tu Service ID
-        'TU_TEMPLATE_ID',    // 2. Reemplaza con tu Template ID
-        form,
-        {
-          publicKey: 'TU_PUBLIC_KEY', // 3. Reemplaza con tu Public Key
+  readonly isSending = signal<boolean>(false);
+  readonly deliveryResult = signal<EmailDeliveryResult | null>(null);
+  readonly errorMessage = signal<string>('');
+
+  ngOnInit(): void {
+    this.route.queryParamMap.subscribe((params) => {
+      const requestedService = params.get('service');
+      if (requestedService) {
+        const match = this.serviceOptions.find((opt) =>
+          opt.toLowerCase().includes(requestedService.toLowerCase())
+        );
+        this.serviceType = match || requestedService;
+        if (!this.subject) {
+          this.subject = `Propuesta: ${requestedService}`;
         }
-    ).then(() => {
-      this.isSent = true;
-      this.isSending = false;
-      form.reset(); // Limpia el formulario después de enviar
-
-      // el boton se resetea tras 10 segundos para permitir nuevos envíos
-      setTimeout(() => {
-        this.isSent = false;
-      }, 10000);
-      }, (error) => {
-        const err = error as EmailJSResponseStatus;
-        console.error('Error al enviar:', err.text);
-        this.isSending = false;
-        this.errorMessage = 'Ocurrió un error al enviar el mensaje. Por favor, inténtalo de nuevo.';
       }
-    ); 
+    });
+  }
+
+  selectService(option: string): void {
+    this.serviceType = option;
+  }
+
+  onSubmit(event: Event): void {
+    event.preventDefault();
+    if (!this.clientName.trim() || !this.clientEmail.trim() || !this.message.trim()) {
+      this.errorMessage.set('Por favor completá tu nombre, email y los detalles del proyecto.');
+      return;
+    }
+
+    this.isSending.set(true);
+    this.errorMessage.set('');
+    this.deliveryResult.set(null);
+
+    const inquiry: ContactInquiry = {
+      clientName: this.clientName.trim(),
+      clientEmail: this.clientEmail.trim(),
+      clientPhone: this.clientPhone.trim() || undefined,
+      serviceType: this.serviceType,
+      eventDate: this.eventDate.trim() || undefined,
+      eventLocation: this.eventLocation.trim() || undefined,
+      subject: this.subject.trim() || `${this.serviceType} — ${this.clientName.trim()}`,
+      message: this.message.trim(),
+      moodboardItems: [...this.moodboard.items()],
+      createdAt: new Date().toISOString(),
+    };
+
+    this.emailPort.sendInquiry(inquiry).subscribe({
+      next: (result) => {
+        this.isSending.set(false);
+        this.deliveryResult.set(result);
+        this.clientName = '';
+        this.clientEmail = '';
+        this.clientPhone = '';
+        this.eventDate = '';
+        this.eventLocation = '';
+        this.subject = '';
+        this.message = '';
+      },
+      error: () => {
+        this.isSending.set(false);
+        this.errorMessage.set(
+          'No se pudo procesar el envío en este momento. Podés escribir directamente a ignacionahuel1@hotmail.com.'
+        );
+      },
+    });
+  }
+
+  resetConfirmation(): void {
+    this.deliveryResult.set(null);
   }
 }

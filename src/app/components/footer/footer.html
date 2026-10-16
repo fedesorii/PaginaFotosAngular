@@ -1,3 +1,72 @@
-<div>
-    <p>* Copyright © 2026 Ignacio Juárez.</p>
-</div>
+<footer class="editorial-footer">
+  <div class="footer-top">
+    <div class="footer-brand">
+      <span class="eyebrow-tag">Archivo Fotográfico &amp; CV</span>
+      <h2 class="footer-signature">Ignacio Juárez</h2>
+      <p class="footer-tagline">
+        Fotografía documental de eventos, gastronomía de producto, retrato y paisaje con impronta
+        analógica. Basado en Quilmes, Zona Sur de Buenos Aires — disponible para comisiones en toda
+        Argentina.
+      </p>
+      <div class="footer-availability">
+        <span class="pulse-dot"></span>
+        <span>{{ portfolioState.profile().availabilityText }}</span>
+      </div>
+    </div>
+
+    <div class="footer-nav-col">
+      <span class="footer-col-title">Carpetas Destacadas</span>
+      <ul class="footer-list">
+        @for (folder of portfolioState.folders().slice(0, 5); track folder.id) {
+          <li>
+            <a [routerLink]="['/gallery', folder.id]">
+              <span class="idx">{{ folder.indexNumber }}</span>
+              {{ folder.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <div class="footer-nav-col">
+      <span class="footer-col-title">Navegación &amp; Estudio</span>
+      <ul class="footer-list">
+        <li><a routerLink="/">Archivo de Portadas</a></li>
+        <li><a routerLink="/about-us">Currículum &amp; Manifiesto</a></li>
+        <li><a routerLink="/contact">Solicitar Presupuesto</a></li>
+        <li><a routerLink="/studio">Panel de Estudio (Admin)</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-nav-col">
+      <span class="footer-col-title">Contacto Directo</span>
+      <ul class="footer-list">
+        <li>
+          <a href="mailto:ignacionahuel1@hotmail.com">ignacionahuel1&#64;hotmail.com</a>
+        </li>
+        <li>
+          <a href="https://www.instagram.com/igna99s/" target="_blank" rel="noopener">
+            Instagram · &#64;igna99s
+          </a>
+        </li>
+        <li>
+          <a href="https://ar.pinterest.com/ignacionahuel1/" target="_blank" rel="noopener">
+            Pinterest · &#64;ignacionahuel1
+          </a>
+        </li>
+        <li class="footer-location">Quilmes, Buenos Aires, AR</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p class="copyright">
+      * Copyright &copy; {{ currentYear }} Ignacio Juárez. Todas las fotografías están protegidas
+      con marca de agua de autoría.
+    </p>
+    <p class="arch-badge">
+      Núcleo Hexagonal Desacoplado · Adaptador activo:
+      <strong>{{ portfolioState.runtimeConfig().mediaAdapter }}</strong>
+    </p>
+  </div>
+</footer>
